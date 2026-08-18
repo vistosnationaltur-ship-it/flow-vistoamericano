@@ -45,7 +45,14 @@ export async function POST(request: NextRequest) {
 
   const nome = pick(payload, ["Nome_Completo_Visto", "Nome Completo", "nome"]);
   if (!nome) {
-    return NextResponse.json({ erro: "Campo de nome não encontrado no payload." }, { status: 400 });
+    return NextResponse.json(
+      {
+        erro: "Campo de nome não encontrado no payload.",
+        camposRecebidos: Object.keys(payload),
+        payloadRecebido: payload,
+      },
+      { status: 400 },
+    );
   }
 
   const cpf = pick(payload, ["cpf_visto", "cpf"]);
