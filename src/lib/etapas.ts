@@ -2,7 +2,9 @@ import { EtapaProcesso } from "@/generated/prisma/client";
 
 export const ORDEM_ETAPAS: EtapaProcesso[] = [
   "CADASTRO",
+  "RASCUNHO_DS160_SOLICITADO",
   "DS160_PREENCHIDO",
+  "BOLETO_MRV_GERADO",
   "PAGAMENTO_MRV",
   "AGENDAMENTO_ENTREVISTA",
   "ENTREVISTA_REALIZADA",
@@ -12,8 +14,10 @@ export const ORDEM_ETAPAS: EtapaProcesso[] = [
 
 export const ETAPA_LABEL: Record<EtapaProcesso, string> = {
   CADASTRO: "Cadastro / dados recebidos",
-  DS160_PREENCHIDO: "DS-160 preenchido",
-  PAGAMENTO_MRV: "Pagamento da taxa (MRV)",
+  RASCUNHO_DS160_SOLICITADO: "Rascunho do DS-160 solicitado (português)",
+  DS160_PREENCHIDO: "DS-160 preenchido no consulado",
+  BOLETO_MRV_GERADO: "Entrada no consulado + boleto MRV gerado",
+  PAGAMENTO_MRV: "Pagamento da taxa (MRV) confirmado",
   AGENDAMENTO_ENTREVISTA: "Entrevista agendada",
   ENTREVISTA_REALIZADA: "Entrevista realizada",
   VISTO_APROVADO: "Visto aprovado",
