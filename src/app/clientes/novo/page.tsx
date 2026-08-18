@@ -16,6 +16,8 @@ export default function NovoClientePage() {
             <Campo label="CPF" name="cpf" />
             <Campo label="E-mail" name="email" type="email" />
             <Campo label="Telefone" name="telefone" />
+            <Campo label="Data de nascimento" name="dataNascimento" type="date" />
+            <Campo label="Endereço" name="endereco" />
           </div>
         </section>
 

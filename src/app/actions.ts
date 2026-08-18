@@ -36,6 +36,8 @@ export async function criarCliente(formData: FormData) {
       cpf,
       email: stringOrNull(formData.get("email")),
       telefone: stringOrNull(formData.get("telefone")),
+      dataNascimento: dateOrNull(formData.get("dataNascimento")),
+      endereco: stringOrNull(formData.get("endereco")),
       numeroPassaporte: stringOrNull(formData.get("numeroPassaporte")),
       validadePassaporte: dateOrNull(formData.get("validadePassaporte")),
       observacoes: stringOrNull(formData.get("observacoes")),

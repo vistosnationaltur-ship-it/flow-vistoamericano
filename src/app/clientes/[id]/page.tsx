@@ -36,7 +36,10 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
         <h1 className="text-xl font-semibold">{cliente.nome}</h1>
         <p className="text-sm text-zinc-500">
           {cliente.email ?? "sem e-mail"} · {cliente.telefone ?? "sem telefone"}
+          {cliente.dataNascimento &&
+            ` · nasc. ${cliente.dataNascimento.toLocaleDateString("pt-BR")}`}
         </p>
+        {cliente.endereco && <p className="text-sm text-zinc-500">{cliente.endereco}</p>}
       </div>
 
       <section className="rounded-md border border-zinc-200 bg-white p-6">

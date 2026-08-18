@@ -29,6 +29,8 @@ model Cliente {
   cpf       String?  @unique
   email     String?
   telefone  String?
+  dataNascimento DateTime?
+  endereco  String?
 
   numeroPassaporte    String?
   validadePassaporte  DateTime?
