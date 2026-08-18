@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint"
   },
@@ -30,7 +31,6 @@
   },
   "allowScripts": {
     "@prisma/engines@7.9.1": true,
-    "better-sqlite3@12.11.1": true,
     "prisma@7.9.1": true,
     "unrs-resolver@1.12.2": true
   }
