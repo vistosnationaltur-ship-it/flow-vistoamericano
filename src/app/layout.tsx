@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { logout } from "@/app/login/actions";
+import { SESSION_COOKIE, sessaoValida } from "@/lib/auth";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,7 +21,10 @@ export const metadata: Metadata = {
   description: "Acompanhamento do processo de assessoria de visto americano de turista",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const cookieStore = await cookies();
+  const autenticado = sessaoValida(cookieStore.get(SESSION_COOKIE)?.value);
+
   return (
     <html
       lang="pt-BR"
@@ -31,19 +36,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/clientes" className="font-semibold tracking-tight">
               Flow Visto Americano
             </Link>
-            <nav className="flex gap-4 text-sm text-zinc-600">
-              <Link href="/clientes" className="hover:text-zinc-900">
-                Clientes
-              </Link>
-              <Link href="/clientes/novo" className="hover:text-zinc-900">
-                Novo cliente
-              </Link>
-              <form action={logout}>
-                <button type="submit" className="hover:text-zinc-900">
-                  Sair
-                </button>
-              </form>
-            </nav>
+            {autenticado && (
+              <nav className="flex gap-4 text-sm text-zinc-600">
+                <Link href="/clientes" className="hover:text-zinc-900">
+                  Clientes
+                </Link>
+                <Link href="/clientes/novo" className="hover:text-zinc-900">
+                  Novo cliente
+                </Link>
+                <form action={logout}>
+                  <button type="submit" className="hover:text-zinc-900">
+                    Sair
+                  </button>
+                </form>
+              </nav>
+            )}
           </div>
         </header>
         <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">{children}</main>
