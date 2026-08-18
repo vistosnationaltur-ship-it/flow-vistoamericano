@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Aceita variações de nome de campo porque o Fluent Forms pode mandar
-// o "name" do input (ex: cpf_visto) ou o label (ex: "CPF Visto"),
-// dependendo de como o webhook foi configurado no formulário.
+// O "Rótulo do campo administrativo" configurado no Fluent Forms (ex:
+// "cpf_visto") NÃO é a chave usada no JSON do webhook — o Fluent manda
+// sempre a chave interna do tipo de campo (ex: "names", "input_mask",
+// "input_mask_1", "phone", "address_1"). Por isso aceitamos várias
+// variações e, pros campos de máscara genéricos (CPF e data de
+// nascimento usam o mesmo tipo de campo), detectamos qual é qual pelo
+// formato do valor em vez de confiar no nome da chave.
 function pick(payload: Record<string, unknown>, candidates: string[]): string | null {
   const normalizar = (s: string) => s.toLowerCase().replace(/[\s_-]+/g, "");
   const entradas = Object.entries(payload);
@@ -12,12 +16,35 @@ function pick(payload: Record<string, unknown>, candidates: string[]): string | 
     const alvo = normalizar(candidato);
     const encontrada = entradas.find(([chave]) => normalizar(chave) === alvo);
     if (encontrada) {
-      const valor = encontrada[1];
-      const texto = (valor ?? "").toString().trim();
+      const texto = textoDeValor(encontrada[1]);
       if (texto !== "") return texto;
     }
   }
   return null;
+}
+
+function textoDeValor(valor: unknown): string {
+  if (valor && typeof valor === "object") {
+    const obj = valor as Record<string, unknown>;
+
+    // Campo "Nome" (Name Fields): { first_name, last_name }
+    const nome = [obj.first_name, obj.last_name].filter(Boolean);
+    if (nome.length > 0) return nome.join(" ").trim();
+
+    // Campo "Endereço" (Address Field): rua, bairro, cidade, estado, cep, país
+    const endereco = [
+      obj.address_line_1,
+      obj.address_line_2,
+      obj.city,
+      obj.state,
+      obj.zip,
+      obj.country,
+    ].filter((parte) => typeof parte === "string" && parte.trim() !== "");
+    if (endereco.length > 0) return endereco.join(", ");
+
+    return "";
+  }
+  return (valor ?? "").toString().trim();
 }
 
 // Fluent Forms manda data no formato brasileiro DD/MM/YYYY.
@@ -27,6 +54,34 @@ function parseDataBr(valor: string | null): Date | null {
   if (!match) return null;
   const [, dia, mes, ano] = match;
   return new Date(Number(ano), Number(mes) - 1, Number(dia));
+}
+
+// Entre os campos de máscara genéricos (input_mask, input_mask_1, ...),
+// acha o que parece CPF (11 dígitos) e o que parece data DD/MM/AAAA.
+function detectarMascaras(payload: Record<string, unknown>): {
+  cpf: string | null;
+  dataNascimentoTexto: string | null;
+} {
+  let cpf: string | null = null;
+  let dataNascimentoTexto: string | null = null;
+
+  for (const [chave, valorBruto] of Object.entries(payload)) {
+    if (!/^input_mask/i.test(chave)) continue;
+    const texto = textoDeValor(valorBruto);
+    if (!texto) continue;
+
+    if (!dataNascimentoTexto && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(texto)) {
+      dataNascimentoTexto = texto;
+      continue;
+    }
+
+    const apenasDigitos = texto.replace(/\D/g, "");
+    if (!cpf && apenasDigitos.length === 11) {
+      cpf = texto;
+    }
+  }
+
+  return { cpf, dataNascimentoTexto };
 }
 
 export async function POST(request: NextRequest) {
@@ -43,7 +98,7 @@ export async function POST(request: NextRequest) {
     (body.fields as Record<string, unknown>) ??
     body;
 
-  const nome = pick(payload, ["Nome_Completo_Visto", "Nome Completo", "nome"]);
+  const nome = pick(payload, ["names", "Nome_Completo_Visto", "Nome Completo", "nome"]);
   if (!nome) {
     return NextResponse.json(
       {
@@ -55,11 +110,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const cpf = pick(payload, ["cpf_visto", "cpf"]);
-  const email = pick(payload, ["Email_Visto", "email"]);
-  const telefone = pick(payload, ["Whatsapp", "whatsapp", "telefone"]);
-  const endereco = pick(payload, ["Address", "endereco", "endereço"]);
-  const dataNascimento = parseDataBr(pick(payload, ["Data de Nascimento", "dataNascimento"]));
+  const { cpf: cpfDetectado, dataNascimentoTexto } = detectarMascaras(payload);
+
+  const cpf = cpfDetectado ?? pick(payload, ["cpf_visto", "cpf"]);
+  const email = pick(payload, ["email", "Email_Visto"]);
+  const telefone = pick(payload, ["phone", "Whatsapp", "whatsapp", "telefone"]);
+  const endereco = pick(payload, ["address_1", "Address", "endereco", "endereço"]);
+  const dataNascimento = parseDataBr(
+    dataNascimentoTexto ?? pick(payload, ["Data de Nascimento", "dataNascimento"]),
+  );
 
   if (cpf) {
     const existente = await prisma.cliente.findUnique({ where: { cpf } });
