@@ -20,7 +20,7 @@ export async function login(formData: FormData) {
     maxAge: 60 * 60 * 24 * 30,
   });
 
-  redirect("/clientes");
+  redirect("/painel");
 }
 
 export async function logout() {

@@ -33,11 +33,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-zinc-50 text-zinc-900">
         <header className="border-b border-zinc-200 bg-white">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-            <Link href="/clientes" className="font-semibold tracking-tight">
+            <Link href="/painel" className="font-semibold tracking-tight">
               Flow Visto Americano
             </Link>
             {autenticado && (
               <nav className="flex gap-4 text-sm text-zinc-600">
+                <Link href="/painel" className="hover:text-zinc-900">
+                  Painel
+                </Link>
                 <Link href="/clientes" className="hover:text-zinc-900">
                   Clientes
                 </Link>
