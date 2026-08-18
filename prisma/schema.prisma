@@ -34,6 +34,9 @@ model Cliente {
   etapaAtual   EtapaProcesso @default(CADASTRO)
   dataEntrevista DateTime?
 
+  valorTaxaMrv    Float?
+  dataPagamentoMrv DateTime?
+
   observacoes String?
 
   criadoEm    DateTime @default(now())

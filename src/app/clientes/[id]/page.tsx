@@ -6,6 +6,7 @@ import {
   avancarEtapa,
   marcarVistoNegado,
   definirDataEntrevista,
+  definirPagamentoMrv,
   atualizarObservacoes,
 } from "@/app/actions";
 
@@ -26,6 +27,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   const avancarComId = avancarEtapa.bind(null, cliente.id);
   const negarComId = marcarVistoNegado.bind(null, cliente.id);
   const dataEntrevistaComId = definirDataEntrevista.bind(null, cliente.id);
+  const pagamentoMrvComId = definirPagamentoMrv.bind(null, cliente.id);
   const observacoesComId = atualizarObservacoes.bind(null, cliente.id);
 
   return (
@@ -123,6 +125,42 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
               defaultValue={
                 cliente.dataEntrevista
                   ? new Date(cliente.dataEntrevista).toISOString().slice(0, 10)
+                  : ""
+              }
+              className="rounded-md border border-zinc-300 px-3 py-2"
+            />
+          </label>
+          <button
+            type="submit"
+            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+          >
+            Salvar
+          </button>
+        </form>
+      </section>
+
+      <section className="rounded-md border border-zinc-200 bg-white p-6">
+        <h2 className="mb-4 text-sm font-semibold text-zinc-500">Pagamento da taxa (MRV)</h2>
+        <form action={pagamentoMrvComId} className="flex flex-wrap items-end gap-3">
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-zinc-600">Valor pago (R$)</span>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              name="valorTaxaMrv"
+              defaultValue={cliente.valorTaxaMrv ?? ""}
+              className="w-32 rounded-md border border-zinc-300 px-3 py-2"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-zinc-600">Pago em</span>
+            <input
+              type="date"
+              name="dataPagamentoMrv"
+              defaultValue={
+                cliente.dataPagamentoMrv
+                  ? new Date(cliente.dataPagamentoMrv).toISOString().slice(0, 10)
                   : ""
               }
               className="rounded-md border border-zinc-300 px-3 py-2"

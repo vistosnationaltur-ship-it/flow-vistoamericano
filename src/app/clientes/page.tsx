@@ -1,12 +1,35 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { ETAPA_LABEL, progresso } from "@/lib/etapas";
-import type { Cliente } from "@/generated/prisma/client";
+import { ETAPA_LABEL, ORDEM_ETAPAS, progresso } from "@/lib/etapas";
+import type { Cliente, EtapaProcesso, Prisma } from "@/generated/prisma/client";
 
-export default async function ClientesPage() {
+const TODAS_ETAPAS: EtapaProcesso[] = [...ORDEM_ETAPAS, "VISTO_NEGADO"];
+
+export default async function ClientesPage(props: PageProps<"/clientes">) {
+  const searchParams = await props.searchParams;
+  const etapa = typeof searchParams.etapa === "string" ? searchParams.etapa : "";
+  const busca = typeof searchParams.busca === "string" ? searchParams.busca.trim() : "";
+
+  const where: Prisma.ClienteWhereInput = {};
+  if (etapa && (TODAS_ETAPAS as string[]).includes(etapa)) {
+    where.etapaAtual = etapa as EtapaProcesso;
+  }
+  if (busca) {
+    where.OR = [
+      { nome: { contains: busca } },
+      { cpf: { contains: busca } },
+      { email: { contains: busca } },
+    ];
+  }
+
   const clientes = await prisma.cliente.findMany({
+    where,
     orderBy: { criadoEm: "desc" },
   });
+
+  const queryString = new URLSearchParams(
+    Object.entries({ etapa, busca }).filter(([, v]) => v),
+  ).toString();
 
   return (
     <div className="flex flex-col gap-6">
@@ -20,9 +43,53 @@ export default async function ClientesPage() {
         </Link>
       </div>
 
+      <form className="flex flex-wrap items-end gap-3 rounded-md border border-zinc-200 bg-white p-4">
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="text-zinc-600">Buscar (nome, CPF ou e-mail)</span>
+          <input
+            type="text"
+            name="busca"
+            defaultValue={busca}
+            className="rounded-md border border-zinc-300 px-3 py-2"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="text-zinc-600">Etapa</span>
+          <select
+            name="etapa"
+            defaultValue={etapa}
+            className="rounded-md border border-zinc-300 px-3 py-2"
+          >
+            <option value="">Todas</option>
+            {TODAS_ETAPAS.map((e) => (
+              <option key={e} value={e}>
+                {ETAPA_LABEL[e]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="submit"
+          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+        >
+          Filtrar
+        </button>
+        {(etapa || busca) && (
+          <Link href="/clientes" className="text-sm text-zinc-500 hover:underline">
+            Limpar filtros
+          </Link>
+        )}
+        <a
+          href={`/clientes/exportar${queryString ? `?${queryString}` : ""}`}
+          className="ml-auto rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+        >
+          Exportar Excel
+        </a>
+      </form>
+
       {clientes.length === 0 ? (
         <p className="rounded-md border border-dashed border-zinc-300 bg-white p-8 text-center text-sm text-zinc-500">
-          Nenhum cliente cadastrado ainda.
+          Nenhum cliente encontrado.
         </p>
       ) : (
         <div className="overflow-hidden rounded-md border border-zinc-200 bg-white">

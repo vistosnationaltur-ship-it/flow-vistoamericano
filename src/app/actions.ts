@@ -99,6 +99,19 @@ export async function definirDataEntrevista(clienteId: string, formData: FormDat
   revalidatePath(`/clientes/${clienteId}`);
 }
 
+export async function definirPagamentoMrv(clienteId: string, formData: FormData) {
+  const valorRaw = stringOrNull(formData.get("valorTaxaMrv"));
+  const valorTaxaMrv = valorRaw ? Number(valorRaw.replace(",", ".")) : null;
+  const dataPagamentoMrv = dateOrNull(formData.get("dataPagamentoMrv"));
+
+  await prisma.cliente.update({
+    where: { id: clienteId },
+    data: { valorTaxaMrv, dataPagamentoMrv },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+}
+
 export async function atualizarObservacoes(clienteId: string, formData: FormData) {
   const observacoes = stringOrNull(formData.get("observacoes"));
 

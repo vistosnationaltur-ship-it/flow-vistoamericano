@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { logout } from "@/app/login/actions";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,6 +38,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/clientes/novo" className="hover:text-zinc-900">
                 Novo cliente
               </Link>
+              <form action={logout}>
+                <button type="submit" className="hover:text-zinc-900">
+                  Sair
+                </button>
+              </form>
             </nav>
           </div>
         </header>
