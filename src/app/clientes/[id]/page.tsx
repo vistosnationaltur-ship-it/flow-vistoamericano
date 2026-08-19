@@ -10,6 +10,7 @@ import {
   marcarVistoNegado,
   definirDataEntrevista,
   definirPagamentoMrv,
+  definirPagamentoServico,
   definirNumeroDs160,
   atualizarObservacoes,
   criarGrupoComCliente,
@@ -42,6 +43,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   const negarComId = marcarVistoNegado.bind(null, cliente.id);
   const dataEntrevistaComId = definirDataEntrevista.bind(null, cliente.id);
   const pagamentoMrvComId = definirPagamentoMrv.bind(null, cliente.id);
+  const pagamentoServicoComId = definirPagamentoServico.bind(null, cliente.id);
   const numeroDs160ComId = definirNumeroDs160.bind(null, cliente.id);
   const observacoesComId = atualizarObservacoes.bind(null, cliente.id);
   const criarGrupoComId = criarGrupoComCliente.bind(null, cliente.id);
@@ -251,6 +253,55 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
           </button>
         </form>
       </section>
+
+      {cliente.grupo ? (
+        <section className="rounded-md border border-zinc-200 bg-white p-6">
+          <h2 className="mb-2 text-sm font-semibold text-zinc-500">Pagamento do serviço</h2>
+          <p className="text-sm text-zinc-500">
+            Esse cliente faz parte da família{" "}
+            <Link href={`/grupos/${cliente.grupo.id}`} className="font-medium hover:underline">
+              {cliente.grupo.nome}
+            </Link>{" "}
+            — o pagamento do serviço é gerenciado lá, não aqui.
+          </p>
+        </section>
+      ) : (
+        <section className="rounded-md border border-zinc-200 bg-white p-6">
+          <h2 className="mb-4 text-sm font-semibold text-zinc-500">Pagamento do serviço</h2>
+          <form action={pagamentoServicoComId} className="flex flex-wrap items-end gap-3">
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="text-zinc-600">Valor pago (R$)</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                name="valorServico"
+                defaultValue={cliente.valorServico ?? ""}
+                className="w-32 rounded-md border border-zinc-300 px-3 py-2"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="text-zinc-600">Pago em</span>
+              <input
+                type="date"
+                name="dataPagamentoServico"
+                defaultValue={
+                  cliente.dataPagamentoServico
+                    ? new Date(cliente.dataPagamentoServico).toISOString().slice(0, 10)
+                    : ""
+                }
+                className="rounded-md border border-zinc-300 px-3 py-2"
+              />
+            </label>
+            <button
+              type="submit"
+              className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+            >
+              Salvar
+            </button>
+          </form>
+        </section>
+      )}
 
       <section className="rounded-md border border-zinc-200 bg-white p-6">
         <h2 className="mb-4 text-sm font-semibold text-zinc-500">Dados do cliente</h2>

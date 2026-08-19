@@ -60,6 +60,12 @@ model Cliente {
   valorTaxaMrv    Float?
   dataPagamentoMrv DateTime?
 
+  // Valor cobrado pela assessoria em si (diferente da taxa MRV, que é
+  // repassada ao consulado). Só usado quando o cliente NÃO está num
+  // grupo familiar — nesse caso o valor fica no Grupo, compartilhado.
+  valorServico         Float?
+  dataPagamentoServico DateTime?
+
   grupoId String?
   grupo   Grupo?  @relation(fields: [grupoId], references: [id])
 

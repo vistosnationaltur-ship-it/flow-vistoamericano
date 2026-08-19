@@ -47,6 +47,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                 <Link href="/clientes/novo" className="hover:text-zinc-900">
                   Novo cliente
                 </Link>
+                <Link href="/financeiro" className="hover:text-zinc-900">
+                  Financeiro
+                </Link>
                 <form action={logout}>
                   <button type="submit" className="hover:text-zinc-900">
                     Sair

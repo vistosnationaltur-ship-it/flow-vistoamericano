@@ -171,6 +171,19 @@ export async function definirPagamentoMrv(clienteId: string, formData: FormData)
   revalidatePath(`/clientes/${clienteId}`);
 }
 
+export async function definirPagamentoServico(clienteId: string, formData: FormData) {
+  const valorRaw = stringOrNull(formData.get("valorServico"));
+  const valorServico = valorRaw ? Number(valorRaw.replace(",", ".")) : null;
+  const dataPagamentoServico = dateOrNull(formData.get("dataPagamentoServico"));
+
+  await prisma.cliente.update({
+    where: { id: clienteId },
+    data: { valorServico, dataPagamentoServico },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+}
+
 export async function definirNumeroDs160(clienteId: string, formData: FormData) {
   const numeroDs160 = stringOrNull(formData.get("numeroDs160"));
 
