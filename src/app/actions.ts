@@ -319,6 +319,21 @@ export async function entrarNoGrupo(clienteId: string, formData: FormData) {
   redirect(`/grupos/${grupoId}`);
 }
 
+export async function adicionarMembroAoGrupo(grupoId: string, formData: FormData) {
+  const clienteId = stringOrNull(formData.get("clienteId"));
+  if (!clienteId) {
+    throw new Error("Selecione um cliente.");
+  }
+
+  await prisma.cliente.update({
+    where: { id: clienteId },
+    data: { grupoId },
+  });
+
+  revalidatePath(`/grupos/${grupoId}`);
+  revalidatePath(`/clientes/${clienteId}`);
+}
+
 export async function sairDoGrupo(clienteId: string) {
   await prisma.cliente.update({
     where: { id: clienteId },

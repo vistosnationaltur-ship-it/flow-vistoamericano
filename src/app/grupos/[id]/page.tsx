@@ -3,7 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ETAPA_LABEL } from "@/lib/etapas";
 import { formatarDataBr } from "@/lib/formatar";
-import { atualizarFinanceiroGrupo } from "@/app/actions";
+import { atualizarFinanceiroGrupo, adicionarMembroAoGrupo } from "@/app/actions";
 
 export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">) {
   const { id } = await props.params;
@@ -15,7 +15,13 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
 
   if (!grupo) notFound();
 
+  const candidatos = await prisma.cliente.findMany({
+    where: { OR: [{ grupoId: null }, { grupoId: { not: grupo.id } }] },
+    orderBy: { nome: "asc" },
+  });
+
   const financeiroComId = atualizarFinanceiroGrupo.bind(null, grupo.id);
+  const adicionarMembroComId = adicionarMembroAoGrupo.bind(null, grupo.id);
   const valorPorPessoa =
     grupo.valorServico && grupo.clientes.length > 0
       ? grupo.valorServico / grupo.clientes.length
@@ -49,6 +55,38 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
             </li>
           ))}
         </ul>
+
+        {candidatos.length > 0 && (
+          <form
+            action={adicionarMembroComId}
+            className="mt-4 flex flex-wrap items-end gap-3 border-t border-white/5 pt-4"
+          >
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="text-zinc-400">Adicionar membro a essa família</span>
+              <select
+                name="clienteId"
+                required
+                defaultValue=""
+                className="w-56 rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
+              >
+                <option value="" disabled>
+                  Selecione um cliente...
+                </option>
+                {candidatos.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nome}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="submit"
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
+            >
+              Adicionar
+            </button>
+          </form>
+        )}
       </section>
 
       <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">

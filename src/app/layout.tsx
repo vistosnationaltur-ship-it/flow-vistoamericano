@@ -61,6 +61,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                   Novo cliente
                 </Link>
                 <Link
+                  href="/grupos"
+                  className="rounded-lg px-3 py-2 transition-colors hover:bg-white/5 hover:text-zinc-100"
+                >
+                  Famílias
+                </Link>
+                <Link
                   href="/financeiro"
                   className="rounded-lg px-3 py-2 transition-colors hover:bg-white/5 hover:text-zinc-100"
                 >
