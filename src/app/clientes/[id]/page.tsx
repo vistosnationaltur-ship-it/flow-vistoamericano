@@ -23,6 +23,7 @@ import {
   excluirDocumentosCliente,
 } from "@/app/actions";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
+import { CampoData } from "@/components/CampoData";
 
 const TIPOS_DOCUMENTO_SUGERIDOS = [
   "Foto do passaporte",
@@ -224,19 +225,16 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
       <section className={CARD}>
         <h2 className={CARD_TITLE}>Entrevista</h2>
         <form action={dataEntrevistaComId} className="flex items-end gap-3">
-          <label className={LABEL}>
-            <span className={LABEL_TEXT}>Data da entrevista</span>
-            <input
-              type="date"
-              name="dataEntrevista"
-              defaultValue={
-                cliente.dataEntrevista
-                  ? new Date(cliente.dataEntrevista).toISOString().slice(0, 10)
-                  : ""
-              }
-              className={INPUT}
-            />
-          </label>
+          <CampoData
+            label="Data da entrevista"
+            name="dataEntrevista"
+            defaultValue={
+              cliente.dataEntrevista
+                ? new Date(cliente.dataEntrevista).toISOString().slice(0, 10)
+                : ""
+            }
+            className={INPUT}
+          />
           <button type="submit" className={BTN_PRIMARY}>
             Salvar
           </button>
@@ -276,19 +274,16 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
               className={`w-32 ${INPUT}`}
             />
           </label>
-          <label className={LABEL}>
-            <span className={LABEL_TEXT}>Pago em</span>
-            <input
-              type="date"
-              name="dataPagamentoMrv"
-              defaultValue={
-                cliente.dataPagamentoMrv
-                  ? new Date(cliente.dataPagamentoMrv).toISOString().slice(0, 10)
-                  : ""
-              }
-              className={INPUT}
-            />
-          </label>
+          <CampoData
+            label="Pago em"
+            name="dataPagamentoMrv"
+            defaultValue={
+              cliente.dataPagamentoMrv
+                ? new Date(cliente.dataPagamentoMrv).toISOString().slice(0, 10)
+                : ""
+            }
+            className={INPUT}
+          />
           <button type="submit" className={BTN_PRIMARY}>
             Salvar
           </button>
@@ -324,19 +319,16 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
                 className={`w-32 ${INPUT}`}
               />
             </label>
-            <label className={LABEL}>
-              <span className={LABEL_TEXT}>Pago em</span>
-              <input
-                type="date"
-                name="dataPagamentoServico"
-                defaultValue={
-                  cliente.dataPagamentoServico
-                    ? new Date(cliente.dataPagamentoServico).toISOString().slice(0, 10)
-                    : ""
-                }
-                className={INPUT}
-              />
-            </label>
+            <CampoData
+              label="Pago em"
+              name="dataPagamentoServico"
+              defaultValue={
+                cliente.dataPagamentoServico
+                  ? new Date(cliente.dataPagamentoServico).toISOString().slice(0, 10)
+                  : ""
+              }
+              className={INPUT}
+            />
             <button type="submit" className={BTN_PRIMARY}>
               Salvar
             </button>

@@ -8,6 +8,7 @@ import {
   adicionarMembroAoGrupo,
   criarMembroFamilia,
 } from "@/app/actions";
+import { CampoData } from "@/components/CampoData";
 
 export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">) {
   const { id } = await props.params;
@@ -138,19 +139,15 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
                 className="w-32 rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
               />
             </label>
-            <label className="flex flex-col gap-1.5 text-sm">
-              <span className="text-zinc-400">Pago em</span>
-              <input
-                type="date"
-                name="dataPagamentoServico"
-                defaultValue={
-                  grupo.dataPagamentoServico
-                    ? new Date(grupo.dataPagamentoServico).toISOString().slice(0, 10)
-                    : ""
-                }
-                className="rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
-              />
-            </label>
+            <CampoData
+              label="Pago em"
+              name="dataPagamentoServico"
+              defaultValue={
+                grupo.dataPagamentoServico
+                  ? new Date(grupo.dataPagamentoServico).toISOString().slice(0, 10)
+                  : ""
+              }
+            />
           </div>
 
           <label className="flex flex-col gap-1.5 text-sm">

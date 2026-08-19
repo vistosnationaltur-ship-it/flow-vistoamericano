@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { atualizarDadosCliente } from "@/app/actions";
+import { CampoData } from "@/components/CampoData";
 
 export default async function EditarClientePage(props: PageProps<"/clientes/[id]/editar">) {
   const { id } = await props.params;
@@ -25,10 +26,9 @@ export default async function EditarClientePage(props: PageProps<"/clientes/[id]
             <Campo label="CPF" name="cpf" defaultValue={cliente.cpf ?? ""} />
             <Campo label="E-mail" name="email" type="email" defaultValue={cliente.email ?? ""} />
             <Campo label="Telefone" name="telefone" defaultValue={cliente.telefone ?? ""} />
-            <Campo
+            <CampoData
               label="Data de nascimento"
               name="dataNascimento"
-              type="date"
               defaultValue={
                 cliente.dataNascimento
                   ? new Date(cliente.dataNascimento).toISOString().slice(0, 10)
@@ -47,20 +47,18 @@ export default async function EditarClientePage(props: PageProps<"/clientes/[id]
               name="numeroPassaporte"
               defaultValue={cliente.numeroPassaporte ?? ""}
             />
-            <Campo
+            <CampoData
               label="Validade"
               name="validadePassaporte"
-              type="date"
               defaultValue={
                 cliente.validadePassaporte
                   ? new Date(cliente.validadePassaporte).toISOString().slice(0, 10)
                   : ""
               }
             />
-            <Campo
+            <CampoData
               label="Vencimento do visto atual (se for renovação)"
               name="dataVencimentoVistoAtual"
-              type="date"
               defaultValue={
                 cliente.dataVencimentoVistoAtual
                   ? new Date(cliente.dataVencimentoVistoAtual).toISOString().slice(0, 10)

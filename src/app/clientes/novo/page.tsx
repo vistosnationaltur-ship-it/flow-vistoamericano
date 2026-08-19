@@ -1,4 +1,5 @@
 import { criarCliente } from "@/app/actions";
+import { CampoData } from "@/components/CampoData";
 
 export default function NovoClientePage() {
   return (
@@ -16,7 +17,7 @@ export default function NovoClientePage() {
             <Campo label="CPF" name="cpf" />
             <Campo label="E-mail" name="email" type="email" />
             <Campo label="Telefone" name="telefone" />
-            <Campo label="Data de nascimento" name="dataNascimento" type="date" />
+            <CampoData label="Data de nascimento" name="dataNascimento" />
             <Campo label="Endereço" name="endereco" />
           </div>
         </section>
@@ -25,11 +26,10 @@ export default function NovoClientePage() {
           <h2 className="text-sm font-semibold text-zinc-500">Passaporte</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Campo label="Número do passaporte" name="numeroPassaporte" />
-            <Campo label="Validade" name="validadePassaporte" type="date" />
-            <Campo
+            <CampoData label="Validade" name="validadePassaporte" />
+            <CampoData
               label="Vencimento do visto atual (se for renovação)"
               name="dataVencimentoVistoAtual"
-              type="date"
             />
           </div>
         </section>
