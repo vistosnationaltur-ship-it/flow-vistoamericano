@@ -2,23 +2,31 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { SESSION_COOKIE, senhaCorreta } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { SESSION_COOKIE, criarTokenSessao } from "@/lib/auth";
+import { senhaConfere } from "@/lib/senha";
 
 export async function login(formData: FormData) {
+  const username = (formData.get("username") ?? "").toString().trim();
   const senha = (formData.get("senha") ?? "").toString();
 
-  if (!senhaCorreta(senha)) {
-    throw new Error("Senha incorreta.");
+  const usuario = await prisma.usuario.findUnique({ where: { username } });
+  if (!usuario || !senhaConfere(senha, usuario.senhaHash)) {
+    throw new Error("Usuário ou senha incorretos.");
   }
 
   const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, process.env.AUTH_SECRET!, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
-  });
+  cookieStore.set(
+    SESSION_COOKIE,
+    criarTokenSessao({ id: usuario.id, username: usuario.username, role: usuario.role }),
+    {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+    },
+  );
 
   redirect("/painel");
 }

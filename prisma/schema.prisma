@@ -25,6 +25,19 @@ enum EtapaProcesso {
   PASSAPORTE_DEVOLVIDO
 }
 
+enum Role {
+  ADMIN
+  USUARIO
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  senhaHash String
+  role      Role     @default(USUARIO)
+  criadoEm  DateTime @default(now())
+}
+
 model Grupo {
   id   String @id @default(cuid())
   nome String

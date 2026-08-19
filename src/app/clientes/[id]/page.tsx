@@ -23,6 +23,7 @@ import {
   excluirDocumentosCliente,
 } from "@/app/actions";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
+import { sessaoAtual } from "@/lib/auth";
 import { CampoData } from "@/components/CampoData";
 
 const TIPOS_DOCUMENTO_SUGERIDOS = [
@@ -45,6 +46,9 @@ const BTN_OUTLINE =
 
 export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id]">) {
   const { id } = await props.params;
+
+  const sessao = await sessaoAtual();
+  const ehAdmin = sessao?.role === "ADMIN";
 
   const cliente = await prisma.cliente.findUnique({
     where: { id },
@@ -106,14 +110,16 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
           <Link href={`/clientes/${cliente.id}/editar`} className={BTN_OUTLINE}>
             Editar dados
           </Link>
-          <form action={excluirComId}>
-            <ConfirmSubmitButton
-              confirmMessage={`Excluir ${cliente.nome} definitivamente? Isso apaga todo o histórico e documentos anexados. Essa ação não pode ser desfeita.`}
-              className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-medium text-red-300 transition-colors hover:bg-red-500/10"
-            >
-              Excluir cliente
-            </ConfirmSubmitButton>
-          </form>
+          {ehAdmin && (
+            <form action={excluirComId}>
+              <ConfirmSubmitButton
+                confirmMessage={`Excluir ${cliente.nome} definitivamente? Isso apaga todo o histórico e documentos anexados. Essa ação não pode ser desfeita.`}
+                className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-medium text-red-300 transition-colors hover:bg-red-500/10"
+              >
+                Excluir cliente
+              </ConfirmSubmitButton>
+            </form>
+          )}
         </div>
       </div>
 
@@ -383,21 +389,23 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
                 >
                   {doc.tipo} — {doc.nomeArquivo}
                 </a>
-                <form action={removerDocumento.bind(null, doc.id)}>
-                  <input type="hidden" name="clienteId" value={cliente.id} />
-                  <button
-                    type="submit"
-                    className="text-xs font-medium text-red-400 hover:text-red-300 hover:underline"
-                  >
-                    Remover
-                  </button>
-                </form>
+                {ehAdmin && (
+                  <form action={removerDocumento.bind(null, doc.id)}>
+                    <input type="hidden" name="clienteId" value={cliente.id} />
+                    <button
+                      type="submit"
+                      className="text-xs font-medium text-red-400 hover:text-red-300 hover:underline"
+                    >
+                      Remover
+                    </button>
+                  </form>
+                )}
               </li>
             ))}
           </ul>
         )}
 
-        {cliente.etapaAtual === "VISTO_APROVADO" && cliente.documentos.length > 0 && (
+        {ehAdmin && cliente.etapaAtual === "VISTO_APROVADO" && cliente.documentos.length > 0 && (
           <form action={excluirDocumentosComId} className="mt-4 border-t border-white/5 pt-4">
             <ConfirmSubmitButton
               confirmMessage="Excluir todos os documentos anexados deste cliente? O histórico do processo é mantido para relatórios, mas os arquivos não podem ser recuperados depois."
@@ -463,14 +471,16 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
                   </li>
                 ))}
             </ul>
-            <form action={sairDoGrupoComId}>
-              <button
-                type="submit"
-                className="self-start rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/5"
-              >
-                Remover deste grupo
-              </button>
-            </form>
+            {ehAdmin && (
+              <form action={sairDoGrupoComId}>
+                <button
+                  type="submit"
+                  className="self-start rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/5"
+                >
+                  Remover deste grupo
+                </button>
+              </form>
+            )}
           </div>
         ) : (
           <div className="flex flex-col gap-4">

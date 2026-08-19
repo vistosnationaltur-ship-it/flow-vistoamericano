@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { SESSION_COOKIE, sessaoValida } from "@/lib/auth";
+import { SESSION_COOKIE, lerTokenSessao } from "@/lib/auth";
 
 export function proxy(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE)?.value;
 
-  if (sessaoValida(token)) {
+  if (lerTokenSessao(token)) {
     return NextResponse.next();
   }
 

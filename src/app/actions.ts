@@ -6,6 +6,8 @@ import { proximaEtapa, etapaAnterior } from "@/lib/etapas";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { put, del } from "@vercel/blob";
+import { exigirAdmin } from "@/lib/auth";
+import { hashSenha } from "@/lib/senha";
 
 function stringOrNull(value: FormDataEntryValue | null): string | null {
   const v = (value ?? "").toString().trim();
@@ -270,6 +272,8 @@ export async function enviarDocumento(clienteId: string, formData: FormData) {
 }
 
 export async function removerDocumento(documentoId: string, formData: FormData) {
+  await exigirAdmin();
+
   const clienteId = stringOrNull(formData.get("clienteId"));
 
   const documento = await prisma.documento.findUniqueOrThrow({ where: { id: documentoId } });
@@ -280,6 +284,8 @@ export async function removerDocumento(documentoId: string, formData: FormData) 
 }
 
 export async function excluirGrupo(grupoId: string) {
+  await exigirAdmin();
+
   await prisma.cliente.updateMany({ where: { grupoId }, data: { grupoId: null } });
   await prisma.grupo.delete({ where: { id: grupoId } });
 
@@ -289,6 +295,8 @@ export async function excluirGrupo(grupoId: string) {
 }
 
 export async function excluirDocumentosCliente(clienteId: string) {
+  await exigirAdmin();
+
   const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
   if (cliente.etapaAtual !== "VISTO_APROVADO") {
     throw new Error("Só é possível excluir os documentos de clientes com visto aprovado.");
@@ -305,6 +313,8 @@ export async function excluirDocumentosCliente(clienteId: string) {
 }
 
 export async function excluirCliente(clienteId: string) {
+  await exigirAdmin();
+
   const documentos = await prisma.documento.findMany({
     where: { clienteId },
     select: { url: true },
@@ -391,6 +401,8 @@ export async function criarMembroFamilia(grupoId: string, formData: FormData) {
 }
 
 export async function sairDoGrupo(clienteId: string) {
+  await exigirAdmin();
+
   await prisma.cliente.update({
     where: { id: clienteId },
     data: { grupoId: null },
@@ -411,6 +423,26 @@ export async function atualizarFinanceiroGrupo(grupoId: string, formData: FormDa
   });
 
   revalidatePath(`/grupos/${grupoId}`);
+}
+
+export async function criarUsuario(formData: FormData) {
+  await exigirAdmin();
+
+  const username = stringOrNull(formData.get("username"))?.toLowerCase();
+  const senha = (formData.get("senha") ?? "").toString();
+  const role = formData.get("role") === "ADMIN" ? "ADMIN" : "USUARIO";
+
+  if (!username) throw new Error("Usuário é obrigatório.");
+  if (senha.length < 6) throw new Error("A senha precisa ter pelo menos 6 caracteres.");
+
+  const existente = await prisma.usuario.findUnique({ where: { username } });
+  if (existente) throw new Error("Já existe um usuário com esse nome.");
+
+  await prisma.usuario.create({
+    data: { username, senhaHash: hashSenha(senha), role },
+  });
+
+  revalidatePath("/usuarios");
 }
 
 export type { EtapaProcesso };

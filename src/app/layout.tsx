@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { logout } from "@/app/login/actions";
-import { SESSION_COOKIE, sessaoValida } from "@/lib/auth";
+import { sessaoAtual } from "@/lib/auth";
 import { SaveToast } from "@/components/SaveToast";
 import "./globals.css";
 
@@ -23,8 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const cookieStore = await cookies();
-  const autenticado = sessaoValida(cookieStore.get(SESSION_COOKIE)?.value);
+  const sessao = await sessaoAtual();
 
   return (
     <html
@@ -41,7 +39,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               <span className="inline-block h-2 w-2 rounded-full bg-indigo-500" />
               Flow Visto Americano
             </Link>
-            {autenticado && (
+            {sessao && (
               <nav className="flex items-center gap-1 text-sm text-zinc-400">
                 <Link
                   href="/painel"
@@ -79,6 +77,17 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                 >
                   Métricas
                 </Link>
+                {sessao.role === "ADMIN" && (
+                  <Link
+                    href="/usuarios"
+                    className="rounded-lg px-3 py-2 transition-colors hover:bg-white/5 hover:text-zinc-100"
+                  >
+                    Usuários
+                  </Link>
+                )}
+                <span className="ml-2 hidden text-xs text-zinc-600 sm:inline">
+                  {sessao.username}
+                </span>
                 <form action={logout} className="ml-1">
                   <button
                     type="submit"

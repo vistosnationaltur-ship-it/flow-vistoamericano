@@ -11,9 +11,13 @@ import {
 } from "@/app/actions";
 import { CampoData } from "@/components/CampoData";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
+import { sessaoAtual } from "@/lib/auth";
 
 export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">) {
   const { id } = await props.params;
+
+  const sessao = await sessaoAtual();
+  const ehAdmin = sessao?.role === "ADMIN";
 
   const grupo = await prisma.grupo.findUnique({
     where: { id },
@@ -47,14 +51,16 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
             {grupo.clientes.length} pessoa{grupo.clientes.length === 1 ? "" : "s"} nesse grupo
           </p>
         </div>
-        <form action={excluirGrupoComId}>
-          <ConfirmSubmitButton
-            confirmMessage={`Excluir a família "${grupo.nome}"? Os clientes não são apagados, só deixam de fazer parte desse grupo (voltam a ter pagamento individual).`}
-            className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-medium text-red-300 transition-colors hover:bg-red-500/10"
-          >
-            Excluir família
-          </ConfirmSubmitButton>
-        </form>
+        {ehAdmin && (
+          <form action={excluirGrupoComId}>
+            <ConfirmSubmitButton
+              confirmMessage={`Excluir a família "${grupo.nome}"? Os clientes não são apagados, só deixam de fazer parte desse grupo (voltam a ter pagamento individual).`}
+              className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-medium text-red-300 transition-colors hover:bg-red-500/10"
+            >
+              Excluir família
+            </ConfirmSubmitButton>
+          </form>
+        )}
       </div>
 
       <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">

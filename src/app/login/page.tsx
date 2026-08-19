@@ -13,12 +13,23 @@ export default function LoginPage() {
           <p className="text-sm text-zinc-500">Acesso restrito à equipe</p>
         </div>
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="text-zinc-400">Senha de acesso</span>
+          <span className="text-zinc-400">Usuário</span>
+          <input
+            type="text"
+            name="username"
+            required
+            autoFocus
+            autoCapitalize="off"
+            autoCorrect="off"
+            className="rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2.5 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
+          />
+        </label>
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="text-zinc-400">Senha</span>
           <input
             type="password"
             name="senha"
             required
-            autoFocus
             className="rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2.5 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
           />
         </label>
