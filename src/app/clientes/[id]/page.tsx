@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import type { HistoricoEtapa } from "@/generated/prisma/client";
-import { ETAPA_LABEL, ORDEM_ETAPAS, progresso, proximaEtapa } from "@/lib/etapas";
+import { ETAPA_LABEL, ORDEM_ETAPAS, progresso, proximaEtapa, etapaAnterior } from "@/lib/etapas";
 import {
   avancarEtapa,
+  voltarEtapa,
   marcarVistoNegado,
   definirDataEntrevista,
   definirPagamentoMrv,
@@ -22,10 +23,12 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   if (!cliente) notFound();
 
   const proxima = proximaEtapa(cliente.etapaAtual);
+  const anterior = etapaAnterior(cliente.etapaAtual);
   const finalizado =
     cliente.etapaAtual === "VISTO_NEGADO" || cliente.etapaAtual === "PASSAPORTE_DEVOLVIDO";
 
   const avancarComId = avancarEtapa.bind(null, cliente.id);
+  const voltarComId = voltarEtapa.bind(null, cliente.id);
   const negarComId = marcarVistoNegado.bind(null, cliente.id);
   const dataEntrevistaComId = definirDataEntrevista.bind(null, cliente.id);
   const pagamentoMrvComId = definirPagamentoMrv.bind(null, cliente.id);
@@ -115,6 +118,17 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
                   className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
                 >
                   Avançar para &quot;{ETAPA_LABEL[proxima]}&quot;
+                </button>
+              </form>
+            )}
+
+            {anterior && (
+              <form action={voltarComId}>
+                <button
+                  type="submit"
+                  className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+                >
+                  Voltar para &quot;{ETAPA_LABEL[anterior]}&quot;
                 </button>
               </form>
             )}

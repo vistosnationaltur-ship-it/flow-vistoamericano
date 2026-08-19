@@ -31,6 +31,12 @@ export function proximaEtapa(atual: EtapaProcesso): EtapaProcesso | null {
   return ORDEM_ETAPAS[i + 1];
 }
 
+export function etapaAnterior(atual: EtapaProcesso): EtapaProcesso | null {
+  const i = ORDEM_ETAPAS.indexOf(atual);
+  if (i <= 0) return null;
+  return ORDEM_ETAPAS[i - 1];
+}
+
 export function progresso(atual: EtapaProcesso): number {
   if (atual === "VISTO_NEGADO") return 100;
   const i = ORDEM_ETAPAS.indexOf(atual);

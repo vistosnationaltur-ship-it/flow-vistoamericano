@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { EtapaProcesso } from "@/generated/prisma/client";
-import { proximaEtapa } from "@/lib/etapas";
+import { proximaEtapa, etapaAnterior } from "@/lib/etapas";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -68,6 +68,28 @@ export async function avancarEtapa(clienteId: string, formData: FormData) {
     data: {
       etapaAtual: proxima,
       historico: { create: { etapa: proxima, observacao } },
+    },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+  revalidatePath("/clientes");
+}
+
+export async function voltarEtapa(clienteId: string) {
+  const cliente = await prisma.cliente.findUniqueOrThrow({
+    where: { id: clienteId },
+  });
+
+  const anterior = etapaAnterior(cliente.etapaAtual);
+  if (!anterior) {
+    throw new Error("Este cliente já está na primeira etapa do processo.");
+  }
+
+  await prisma.cliente.update({
+    where: { id: clienteId },
+    data: {
+      etapaAtual: anterior,
+      historico: { create: { etapa: anterior, observacao: "Etapa revertida" } },
     },
   });
 
