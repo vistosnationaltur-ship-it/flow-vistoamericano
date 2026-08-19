@@ -50,6 +50,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                 <Link href="/financeiro" className="hover:text-zinc-900">
                   Financeiro
                 </Link>
+                <Link href="/metricas" className="hover:text-zinc-900">
+                  Métricas
+                </Link>
                 <form action={logout}>
                   <button type="submit" className="hover:text-zinc-900">
                     Sair
