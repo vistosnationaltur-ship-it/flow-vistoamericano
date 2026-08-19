@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { ETAPA_LABEL, ORDEM_ETAPAS } from "@/lib/etapas";
+import {
+  ETAPA_LABEL,
+  ORDEM_ETAPAS,
+  LIMITE_DIAS_ALERTA,
+  dataEntradaEtapa,
+  diasParado,
+  estaAtrasado,
+} from "@/lib/etapas";
 import type { EtapaProcesso } from "@/generated/prisma/client";
 
 const TODAS_ETAPAS: EtapaProcesso[] = [...ORDEM_ETAPAS, "VISTO_NEGADO"];
@@ -14,6 +21,18 @@ export default async function PainelPage() {
   const total = contagens.reduce((soma, c) => soma + c._count._all, 0);
   const porEtapa = new Map(contagens.map((c) => [c.etapaAtual, c._count._all]));
 
+  const etapasMonitoradas = Object.keys(LIMITE_DIAS_ALERTA) as EtapaProcesso[];
+  const candidatos =
+    etapasMonitoradas.length > 0
+      ? await prisma.cliente.findMany({
+          where: { etapaAtual: { in: etapasMonitoradas } },
+          include: { historico: { orderBy: { criadoEm: "desc" } } },
+        })
+      : [];
+  const atrasados = candidatos.filter((c) =>
+    estaAtrasado(c.etapaAtual, diasParado(dataEntradaEtapa(c.historico, c.etapaAtual))),
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -22,6 +41,31 @@ export default async function PainelPage() {
           {total} cliente{total === 1 ? "" : "s"} no total
         </p>
       </div>
+
+      {atrasados.length > 0 && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4">
+          <p className="text-sm font-medium text-red-700">
+            ⚠ {atrasados.length} cliente{atrasados.length === 1 ? "" : "s"} parado
+            {atrasados.length === 1 ? "" : "s"} há mais de {LIMITE_DIAS_ALERTA.RASCUNHO_DS160_SOLICITADO} dias
+          </p>
+          <ul className="mt-2 flex flex-col gap-1">
+            {atrasados.map((c) => {
+              const dias = diasParado(dataEntradaEtapa(c.historico, c.etapaAtual));
+              return (
+                <li key={c.id} className="text-sm">
+                  <Link href={`/clientes/${c.id}`} className="text-red-700 hover:underline">
+                    {c.nome}
+                  </Link>
+                  <span className="text-red-600">
+                    {" "}
+                    — {ETAPA_LABEL[c.etapaAtual]} há {dias} dias
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {TODAS_ETAPAS.map((etapa) => {

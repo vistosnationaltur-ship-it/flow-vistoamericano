@@ -43,3 +43,29 @@ export function progresso(atual: EtapaProcesso): number {
   if (i === -1) return 0;
   return Math.round(((i + 1) / ORDEM_ETAPAS.length) * 100);
 }
+
+// Quantos dias um cliente pode ficar parado numa etapa antes de virar
+// alerta. Só as etapas listadas aqui são monitoradas.
+export const LIMITE_DIAS_ALERTA: Partial<Record<EtapaProcesso, number>> = {
+  RASCUNHO_DS160_SOLICITADO: 10,
+};
+
+// Assume que `historico` vem ordenado do mais novo pro mais antigo
+// (mesma ordem usada nas páginas). Pega a entrada mais recente em que
+// o cliente atingiu essa etapa.
+export function dataEntradaEtapa(
+  historico: { etapa: EtapaProcesso; criadoEm: Date }[],
+  etapa: EtapaProcesso,
+): Date | null {
+  return historico.find((h) => h.etapa === etapa)?.criadoEm ?? null;
+}
+
+export function diasParado(dataEntrada: Date | null): number | null {
+  if (!dataEntrada) return null;
+  return Math.floor((Date.now() - dataEntrada.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export function estaAtrasado(etapa: EtapaProcesso, dias: number | null): boolean {
+  const limite = LIMITE_DIAS_ALERTA[etapa];
+  return limite != null && dias != null && dias > limite;
+}
