@@ -187,7 +187,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
                   type="submit"
                   className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-500"
                 >
-                  Enviar contrato (WhatsApp)
+                  Enviar contrato (Authentique)
                 </button>
               </form>
             )}

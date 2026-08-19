@@ -8,6 +8,8 @@ import { redirect } from "next/navigation";
 import { put, del } from "@vercel/blob";
 import { exigirAdmin } from "@/lib/auth";
 import { hashSenha } from "@/lib/senha";
+import { gerarContratoHtml } from "@/lib/contrato";
+import { criarDocumentoAssinatura } from "@/lib/authentique";
 
 function stringOrNull(value: FormDataEntryValue | null): string | null {
   const v = (value ?? "").toString().trim();
@@ -90,32 +92,25 @@ export async function atualizarDadosCliente(clienteId: string, formData: FormDat
 }
 
 export async function enviarContrato(clienteId: string) {
-  const webhookUrl = process.env.N8N_WEBHOOK_CONTRATO_URL;
-  if (!webhookUrl) {
-    throw new Error(
-      "Variável N8N_WEBHOOK_CONTRATO_URL não configurada — peça pro administrador do sistema configurar isso.",
-    );
-  }
-
   const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
 
-  const resposta = await fetch(webhookUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      clienteId: cliente.id,
-      nome: cliente.nome,
-      email: cliente.email,
-      telefone: cliente.telefone,
-      cpf: cliente.cpf,
-    }),
+  if (!cliente.email) {
+    throw new Error("Cliente não tem e-mail cadastrado — o Authentique precisa de um e-mail pra enviar a assinatura.");
+  }
+
+  const html = gerarContratoHtml({
+    nome: cliente.nome,
+    cpf: cliente.cpf,
+    email: cliente.email,
   });
 
-  if (!resposta.ok) {
-    throw new Error(
-      `O N8N respondeu com erro (status ${resposta.status}) — o contrato pode não ter sido enviado. Confira o workflow no N8N.`,
-    );
-  }
+  const authentiqueDocumentId = await criarDocumentoAssinatura({
+    nomeDocumento: `Contrato - ${cliente.nome}`,
+    nomeArquivo: `Contrato_${cliente.nome.replace(/\s+/g, "_")}`,
+    html,
+    nomeSignatario: cliente.nome,
+    emailSignatario: cliente.email,
+  });
 
   await prisma.cliente.update({
     where: { id: clienteId },
@@ -123,7 +118,10 @@ export async function enviarContrato(clienteId: string) {
       contratoEnviadoEm: new Date(),
       etapaAtual: cliente.etapaAtual === "CADASTRO" ? "CONTRATO_ENVIADO" : cliente.etapaAtual,
       historico: {
-        create: { etapa: "CONTRATO_ENVIADO", observacao: "Contrato disparado via N8N" },
+        create: { etapa: "CONTRATO_ENVIADO", observacao: "Contrato enviado via Authentique" },
+      },
+      contratos: {
+        create: { conteudoHtml: html, authentiqueDocumentId },
       },
     },
   });
