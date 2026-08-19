@@ -193,4 +193,56 @@ export async function atualizarObservacoes(clienteId: string, formData: FormData
   revalidatePath(`/clientes/${clienteId}`);
 }
 
+export async function criarGrupoComCliente(clienteId: string, formData: FormData) {
+  const nome = stringOrNull(formData.get("nomeGrupo"));
+  if (!nome) {
+    throw new Error("Nome da família é obrigatório.");
+  }
+
+  const grupo = await prisma.grupo.create({
+    data: { nome, clientes: { connect: { id: clienteId } } },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+  redirect(`/grupos/${grupo.id}`);
+}
+
+export async function entrarNoGrupo(clienteId: string, formData: FormData) {
+  const grupoId = stringOrNull(formData.get("grupoId"));
+  if (!grupoId) {
+    throw new Error("Selecione uma família.");
+  }
+
+  await prisma.cliente.update({
+    where: { id: clienteId },
+    data: { grupoId },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+  redirect(`/grupos/${grupoId}`);
+}
+
+export async function sairDoGrupo(clienteId: string) {
+  await prisma.cliente.update({
+    where: { id: clienteId },
+    data: { grupoId: null },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+}
+
+export async function atualizarFinanceiroGrupo(grupoId: string, formData: FormData) {
+  const valorRaw = stringOrNull(formData.get("valorServico"));
+  const valorServico = valorRaw ? Number(valorRaw.replace(",", ".")) : null;
+  const dataPagamentoServico = dateOrNull(formData.get("dataPagamentoServico"));
+  const observacoesFinanceiras = stringOrNull(formData.get("observacoesFinanceiras"));
+
+  await prisma.grupo.update({
+    where: { id: grupoId },
+    data: { valorServico, dataPagamentoServico, observacoesFinanceiras },
+  });
+
+  revalidatePath(`/grupos/${grupoId}`);
+}
+
 export type { EtapaProcesso };

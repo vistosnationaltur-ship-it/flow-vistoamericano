@@ -24,6 +24,22 @@ enum EtapaProcesso {
   PASSAPORTE_DEVOLVIDO
 }
 
+model Grupo {
+  id   String @id @default(cuid())
+  nome String
+
+  // Pagamento do serviço de assessoria costuma ser combinado por
+  // família (um valor só, justificado pelo número de pessoas), por
+  // isso fica no grupo em vez de em cada cliente.
+  valorServico          Float?
+  dataPagamentoServico  DateTime?
+  observacoesFinanceiras String?
+
+  criadoEm DateTime @default(now())
+
+  clientes Cliente[]
+}
+
 model Cliente {
   id        String   @id @default(cuid())
   nome      String
@@ -44,12 +60,17 @@ model Cliente {
   valorTaxaMrv    Float?
   dataPagamentoMrv DateTime?
 
+  grupoId String?
+  grupo   Grupo?  @relation(fields: [grupoId], references: [id])
+
   observacoes String?
 
   criadoEm    DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 
   historico HistoricoEtapa[]
+
+  @@index([grupoId])
 }
 
 model HistoricoEtapa {

@@ -12,6 +12,9 @@ import {
   definirPagamentoMrv,
   definirNumeroDs160,
   atualizarObservacoes,
+  criarGrupoComCliente,
+  entrarNoGrupo,
+  sairDoGrupo,
 } from "@/app/actions";
 
 export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id]">) {
@@ -19,10 +22,15 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
 
   const cliente = await prisma.cliente.findUnique({
     where: { id },
-    include: { historico: { orderBy: { criadoEm: "desc" } } },
+    include: { historico: { orderBy: { criadoEm: "desc" } }, grupo: { include: { clientes: true } } },
   });
 
   if (!cliente) notFound();
+
+  const outrosGrupos = await prisma.grupo.findMany({
+    where: cliente.grupoId ? { id: { not: cliente.grupoId } } : {},
+    orderBy: { criadoEm: "desc" },
+  });
 
   const proxima = proximaEtapa(cliente.etapaAtual);
   const anterior = etapaAnterior(cliente.etapaAtual);
@@ -36,6 +44,9 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   const pagamentoMrvComId = definirPagamentoMrv.bind(null, cliente.id);
   const numeroDs160ComId = definirNumeroDs160.bind(null, cliente.id);
   const observacoesComId = atualizarObservacoes.bind(null, cliente.id);
+  const criarGrupoComId = criarGrupoComCliente.bind(null, cliente.id);
+  const entrarNoGrupoComId = entrarNoGrupo.bind(null, cliente.id);
+  const sairDoGrupoComId = sairDoGrupo.bind(null, cliente.id);
 
   // Data em que cada etapa foi atingida, pela ocorrência mais recente
   // no histórico (que já vem ordenado do mais novo pro mais antigo).
@@ -263,6 +274,89 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
             value={new Date(cliente.criadoEm).toLocaleDateString("pt-BR")}
           />
         </dl>
+      </section>
+
+      <section className="rounded-md border border-zinc-200 bg-white p-6">
+        <h2 className="mb-4 text-sm font-semibold text-zinc-500">Grupo familiar</h2>
+
+        {cliente.grupo ? (
+          <div className="flex flex-col gap-3">
+            <p className="text-sm">
+              Faz parte da família{" "}
+              <Link href={`/grupos/${cliente.grupo.id}`} className="font-medium hover:underline">
+                {cliente.grupo.nome}
+              </Link>{" "}
+              ({cliente.grupo.clientes.length} pessoa
+              {cliente.grupo.clientes.length === 1 ? "" : "s"})
+            </p>
+            <ul className="flex flex-col gap-1 text-sm text-zinc-600">
+              {cliente.grupo.clientes
+                .filter((c) => c.id !== cliente.id)
+                .map((c) => (
+                  <li key={c.id}>
+                    <Link href={`/clientes/${c.id}`} className="hover:underline">
+                      {c.nome}
+                    </Link>
+                  </li>
+                ))}
+            </ul>
+            <form action={sairDoGrupoComId}>
+              <button
+                type="submit"
+                className="self-start rounded-md border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
+              >
+                Remover deste grupo
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <form action={criarGrupoComId} className="flex items-end gap-3">
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="text-zinc-600">Criar novo grupo familiar</span>
+                <input
+                  type="text"
+                  name="nomeGrupo"
+                  placeholder="Ex: Silva"
+                  required
+                  className="rounded-md border border-zinc-300 px-3 py-2"
+                />
+              </label>
+              <button
+                type="submit"
+                className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+              >
+                Criar
+              </button>
+            </form>
+
+            {outrosGrupos.length > 0 && (
+              <form action={entrarNoGrupoComId} className="flex items-end gap-3">
+                <label className="flex flex-col gap-1 text-sm">
+                  <span className="text-zinc-600">Ou adicionar a uma família existente</span>
+                  <select
+                    name="grupoId"
+                    required
+                    className="rounded-md border border-zinc-300 px-3 py-2"
+                  >
+                    <option value="">Selecione...</option>
+                    {outrosGrupos.map((g) => (
+                      <option key={g.id} value={g.id}>
+                        {g.nome}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="submit"
+                  className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                >
+                  Adicionar
+                </button>
+              </form>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="rounded-md border border-zinc-200 bg-white p-6">
