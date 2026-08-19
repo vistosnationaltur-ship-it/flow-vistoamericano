@@ -10,6 +10,7 @@ import {
   excluirGrupo,
 } from "@/app/actions";
 import { CampoData } from "@/components/CampoData";
+import { CampoMoeda } from "@/components/CampoMoeda";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { sessaoAtual } from "@/lib/auth";
 
@@ -147,17 +148,7 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
         </h2>
         <form action={financeiroComId} className="flex flex-col gap-3">
           <div className="flex flex-wrap items-end gap-3">
-            <label className="flex flex-col gap-1.5 text-sm">
-              <span className="text-zinc-400">Valor total (R$)</span>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                name="valorServico"
-                defaultValue={grupo.valorServico ?? ""}
-                className="w-32 rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
-              />
-            </label>
+            <CampoMoeda label="Valor total" name="valorServico" defaultValue={grupo.valorServico} />
             <CampoData
               label="Pago em"
               name="dataPagamentoServico"

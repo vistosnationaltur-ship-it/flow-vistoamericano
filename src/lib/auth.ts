@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import type { Role } from "@/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
 
 export const SESSION_COOKIE = "flow_visto_session";
 
@@ -55,9 +56,16 @@ export async function sessaoAtual(): Promise<Sessao | null> {
   return lerTokenSessao(cookieStore.get(SESSION_COOKIE)?.value);
 }
 
-export async function exigirAdmin(): Promise<void> {
+// Reconsulta o papel no banco em vez de confiar só no cookie: uma
+// promoção/rebaixamento ou exclusão de usuário precisa valer na hora,
+// não só depois que a sessão (assinada, sem estado) expirar sozinha.
+export async function exigirAdmin(): Promise<Sessao> {
   const sessao = await sessaoAtual();
-  if (sessao?.role !== "ADMIN") {
+  if (!sessao) throw new Error("Não autenticado.");
+
+  const usuario = await prisma.usuario.findUnique({ where: { id: sessao.id } });
+  if (!usuario || usuario.role !== "ADMIN") {
     throw new Error("Apenas administradores podem fazer isso.");
   }
+  return sessao;
 }

@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { sessaoAtual } from "@/lib/auth";
-import { criarUsuario } from "@/app/actions";
+import { criarUsuario, excluirUsuario } from "@/app/actions";
 import { formatarDataBr } from "@/lib/formatar";
+import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 
 const INPUT =
   "rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30";
@@ -78,6 +79,16 @@ export default async function UsuariosPage() {
                 <span className="text-xs text-zinc-500">
                   desde {formatarDataBr(u.criadoEm)}
                 </span>
+                {u.id !== sessao.id && (
+                  <form action={excluirUsuario.bind(null, u.id)}>
+                    <ConfirmSubmitButton
+                      confirmMessage={`Excluir o usuário "${u.username}"? Ele perde o acesso ao sistema imediatamente.`}
+                      className="text-xs font-medium text-red-400 hover:text-red-300 hover:underline"
+                    >
+                      Excluir
+                    </ConfirmSubmitButton>
+                  </form>
+                )}
               </div>
             </li>
           ))}

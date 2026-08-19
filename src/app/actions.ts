@@ -445,4 +445,23 @@ export async function criarUsuario(formData: FormData) {
   revalidatePath("/usuarios");
 }
 
+export async function excluirUsuario(usuarioId: string) {
+  const sessao = await exigirAdmin();
+
+  if (sessao.id === usuarioId) {
+    throw new Error("Você não pode excluir seu próprio usuário.");
+  }
+
+  const alvo = await prisma.usuario.findUniqueOrThrow({ where: { id: usuarioId } });
+  if (alvo.role === "ADMIN") {
+    const totalAdmins = await prisma.usuario.count({ where: { role: "ADMIN" } });
+    if (totalAdmins <= 1) {
+      throw new Error("Não é possível excluir o último administrador.");
+    }
+  }
+
+  await prisma.usuario.delete({ where: { id: usuarioId } });
+  revalidatePath("/usuarios");
+}
+
 export type { EtapaProcesso };

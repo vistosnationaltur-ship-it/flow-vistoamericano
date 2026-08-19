@@ -25,6 +25,7 @@ import {
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { sessaoAtual } from "@/lib/auth";
 import { CampoData } from "@/components/CampoData";
+import { CampoMoeda } from "@/components/CampoMoeda";
 
 const TIPOS_DOCUMENTO_SUGERIDOS = [
   "Foto do passaporte",
@@ -269,17 +270,12 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
       <section className={CARD}>
         <h2 className={CARD_TITLE}>Pagamento da taxa (MRV)</h2>
         <form action={pagamentoMrvComId} className="flex flex-wrap items-end gap-3">
-          <label className={LABEL}>
-            <span className={LABEL_TEXT}>Valor pago (R$)</span>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              name="valorTaxaMrv"
-              defaultValue={cliente.valorTaxaMrv ?? ""}
-              className={`w-32 ${INPUT}`}
-            />
-          </label>
+          <CampoMoeda
+            label="Valor pago"
+            name="valorTaxaMrv"
+            defaultValue={cliente.valorTaxaMrv}
+            className={`w-32 ${INPUT}`}
+          />
           <CampoData
             label="Pago em"
             name="dataPagamentoMrv"
@@ -314,17 +310,12 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
         <section className={CARD}>
           <h2 className={CARD_TITLE}>Pagamento do serviço</h2>
           <form action={pagamentoServicoComId} className="flex flex-wrap items-end gap-3">
-            <label className={LABEL}>
-              <span className={LABEL_TEXT}>Valor pago (R$)</span>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                name="valorServico"
-                defaultValue={cliente.valorServico ?? ""}
-                className={`w-32 ${INPUT}`}
-              />
-            </label>
+            <CampoMoeda
+              label="Valor pago"
+              name="valorServico"
+              defaultValue={cliente.valorServico}
+              className={`w-32 ${INPUT}`}
+            />
             <CampoData
               label="Pago em"
               name="dataPagamentoServico"
