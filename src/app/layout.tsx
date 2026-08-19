@@ -4,6 +4,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { logout } from "@/app/login/actions";
 import { SESSION_COOKIE, sessaoValida } from "@/lib/auth";
+import { SaveToast } from "@/components/SaveToast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -91,6 +92,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           </div>
         </header>
         <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">{children}</main>
+        <SaveToast />
       </body>
     </html>
   );
