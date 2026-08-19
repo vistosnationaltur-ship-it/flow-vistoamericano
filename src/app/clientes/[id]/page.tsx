@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import type { HistoricoEtapa } from "@/generated/prisma/client";
 import { ETAPA_LABEL, ORDEM_ETAPAS, progresso, proximaEtapa, etapaAnterior } from "@/lib/etapas";
@@ -45,14 +46,22 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-semibold">{cliente.nome}</h1>
-        <p className="text-sm text-zinc-500">
-          {cliente.email ?? "sem e-mail"} · {cliente.telefone ?? "sem telefone"}
-          {cliente.dataNascimento &&
-            ` · nasc. ${formatarDataBr(cliente.dataNascimento)}`}
-        </p>
-        {cliente.endereco && <p className="text-sm text-zinc-500">{cliente.endereco}</p>}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">{cliente.nome}</h1>
+          <p className="text-sm text-zinc-500">
+            {cliente.email ?? "sem e-mail"} · {cliente.telefone ?? "sem telefone"}
+            {cliente.dataNascimento &&
+              ` · nasc. ${formatarDataBr(cliente.dataNascimento)}`}
+          </p>
+          {cliente.endereco && <p className="text-sm text-zinc-500">{cliente.endereco}</p>}
+        </div>
+        <Link
+          href={`/clientes/${cliente.id}/editar`}
+          className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+        >
+          Editar dados
+        </Link>
       </div>
 
       <section className="rounded-md border border-zinc-200 bg-white p-6">

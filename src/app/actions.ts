@@ -51,6 +51,39 @@ export async function criarCliente(formData: FormData) {
   redirect(`/clientes/${cliente.id}`);
 }
 
+export async function atualizarDadosCliente(clienteId: string, formData: FormData) {
+  const nome = stringOrNull(formData.get("nome"));
+  if (!nome) {
+    throw new Error("Nome é obrigatório.");
+  }
+
+  const cpf = stringOrNull(formData.get("cpf"));
+  if (cpf) {
+    const existente = await prisma.cliente.findUnique({ where: { cpf } });
+    if (existente && existente.id !== clienteId) {
+      throw new Error("Já existe outro cliente cadastrado com esse CPF.");
+    }
+  }
+
+  await prisma.cliente.update({
+    where: { id: clienteId },
+    data: {
+      nome,
+      cpf,
+      email: stringOrNull(formData.get("email")),
+      telefone: stringOrNull(formData.get("telefone")),
+      dataNascimento: dateOrNull(formData.get("dataNascimento")),
+      endereco: stringOrNull(formData.get("endereco")),
+      numeroPassaporte: stringOrNull(formData.get("numeroPassaporte")),
+      validadePassaporte: dateOrNull(formData.get("validadePassaporte")),
+    },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+  revalidatePath("/clientes");
+  redirect(`/clientes/${clienteId}`);
+}
+
 export async function avancarEtapa(clienteId: string, formData: FormData) {
   const cliente = await prisma.cliente.findUniqueOrThrow({
     where: { id: clienteId },
