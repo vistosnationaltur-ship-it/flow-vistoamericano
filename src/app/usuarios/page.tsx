@@ -21,6 +21,20 @@ export default async function UsuariosPage() {
       <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Usuários</h1>
 
       <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
+        <h2 className="mb-1 text-sm font-semibold text-zinc-500">Backup</h2>
+        <p className="mb-4 text-sm text-zinc-500">
+          Baixa uma cópia de tudo (clientes, famílias, histórico, documentos, contratos e
+          usuários) num arquivo JSON — guarde num lugar seguro fora da Vercel de vez em quando.
+        </p>
+        <a
+          href="/admin/backup"
+          className="inline-flex rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/5"
+        >
+          Baixar backup
+        </a>
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
         <h2 className="mb-4 text-sm font-semibold text-zinc-500">Cadastrar novo usuário</h2>
         <form action={criarUsuario} className="flex flex-wrap items-end gap-3">
           <label className={LABEL}>
