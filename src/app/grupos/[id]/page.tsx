@@ -3,7 +3,11 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ETAPA_LABEL } from "@/lib/etapas";
 import { formatarDataBr } from "@/lib/formatar";
-import { atualizarFinanceiroGrupo, adicionarMembroAoGrupo } from "@/app/actions";
+import {
+  atualizarFinanceiroGrupo,
+  adicionarMembroAoGrupo,
+  criarMembroFamilia,
+} from "@/app/actions";
 
 export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">) {
   const { id } = await props.params;
@@ -22,6 +26,7 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
 
   const financeiroComId = atualizarFinanceiroGrupo.bind(null, grupo.id);
   const adicionarMembroComId = adicionarMembroAoGrupo.bind(null, grupo.id);
+  const criarMembroComId = criarMembroFamilia.bind(null, grupo.id);
   const valorPorPessoa =
     grupo.valorServico && grupo.clientes.length > 0
       ? grupo.valorServico / grupo.clientes.length
@@ -56,37 +61,64 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
           ))}
         </ul>
 
-        {candidatos.length > 0 && (
-          <form
-            action={adicionarMembroComId}
-            className="mt-4 flex flex-wrap items-end gap-3 border-t border-white/5 pt-4"
-          >
+        <div className="mt-4 flex flex-col gap-4 border-t border-white/5 pt-4">
+          <form action={criarMembroComId} className="flex flex-wrap items-end gap-3">
             <label className="flex flex-col gap-1.5 text-sm">
-              <span className="text-zinc-400">Adicionar membro a essa família</span>
-              <select
-                name="clienteId"
+              <span className="text-zinc-400">Cadastrar um membro novo nessa família</span>
+              <input
+                type="text"
+                name="nome"
                 required
-                defaultValue=""
+                placeholder="Nome completo"
                 className="w-56 rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
-              >
-                <option value="" disabled>
-                  Selecione um cliente...
-                </option>
-                {candidatos.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nome}
-                  </option>
-                ))}
-              </select>
+              />
             </label>
             <button
               type="submit"
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
             >
-              Adicionar
+              Criar e adicionar
             </button>
           </form>
-        )}
+          <p className="text-xs text-zinc-500">
+            Cria essa pessoa do zero, já vinculada a essa família, com o próprio pipeline de
+            etapas — não precisa ter feito cadastro pelo site antes. Depois você completa os
+            outros dados dela (CPF, e-mail, passaporte...) na página dela em &quot;Editar
+            dados&quot;.
+          </p>
+
+          {candidatos.length > 0 && (
+            <form
+              action={adicionarMembroComId}
+              className="flex flex-wrap items-end gap-3 border-t border-white/5 pt-4"
+            >
+              <label className="flex flex-col gap-1.5 text-sm">
+                <span className="text-zinc-400">Ou adicionar alguém já cadastrado</span>
+                <select
+                  name="clienteId"
+                  required
+                  defaultValue=""
+                  className="w-56 rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
+                >
+                  <option value="" disabled>
+                    Selecione um cliente...
+                  </option>
+                  {candidatos.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.nome}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="submit"
+                className="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/5"
+              >
+                Adicionar
+              </button>
+            </form>
+          )}
+        </div>
       </section>
 
       <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">

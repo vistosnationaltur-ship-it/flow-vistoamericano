@@ -334,6 +334,24 @@ export async function adicionarMembroAoGrupo(grupoId: string, formData: FormData
   revalidatePath(`/clientes/${clienteId}`);
 }
 
+export async function criarMembroFamilia(grupoId: string, formData: FormData) {
+  const nome = stringOrNull(formData.get("nome"));
+  if (!nome) {
+    throw new Error("Nome é obrigatório.");
+  }
+
+  const cliente = await prisma.cliente.create({
+    data: {
+      nome,
+      grupoId,
+      historico: { create: { etapa: "CADASTRO" } },
+    },
+  });
+
+  revalidatePath(`/grupos/${grupoId}`);
+  redirect(`/clientes/${cliente.id}`);
+}
+
 export async function sairDoGrupo(clienteId: string) {
   await prisma.cliente.update({
     where: { id: clienteId },
