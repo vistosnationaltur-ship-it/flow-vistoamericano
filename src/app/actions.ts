@@ -279,6 +279,22 @@ export async function removerDocumento(documentoId: string, formData: FormData) 
   if (clienteId) revalidatePath(`/clientes/${clienteId}`);
 }
 
+export async function excluirDocumentosCliente(clienteId: string) {
+  const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
+  if (cliente.etapaAtual !== "VISTO_APROVADO") {
+    throw new Error("Só é possível excluir os documentos de clientes com visto aprovado.");
+  }
+
+  const documentos = await prisma.documento.findMany({
+    where: { clienteId },
+    select: { id: true, url: true },
+  });
+  await Promise.all(documentos.map((doc) => del(doc.url)));
+  await prisma.documento.deleteMany({ where: { clienteId } });
+
+  revalidatePath(`/clientes/${clienteId}`);
+}
+
 export async function excluirCliente(clienteId: string) {
   const documentos = await prisma.documento.findMany({
     where: { clienteId },

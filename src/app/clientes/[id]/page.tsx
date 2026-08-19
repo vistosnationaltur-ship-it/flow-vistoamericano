@@ -20,6 +20,7 @@ import {
   removerDocumento,
   enviarContrato,
   excluirCliente,
+  excluirDocumentosCliente,
 } from "@/app/actions";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 
@@ -79,6 +80,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   const sairDoGrupoComId = sairDoGrupo.bind(null, cliente.id);
   const enviarContratoComId = enviarContrato.bind(null, cliente.id);
   const excluirComId = excluirCliente.bind(null, cliente.id);
+  const excluirDocumentosComId = excluirDocumentosCliente.bind(null, cliente.id);
 
   // Data em que cada etapa foi atingida, pela ocorrência mais recente
   // no histórico (que já vem ordenado do mais novo pro mais antigo).
@@ -401,6 +403,17 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
               </li>
             ))}
           </ul>
+        )}
+
+        {cliente.etapaAtual === "VISTO_APROVADO" && cliente.documentos.length > 0 && (
+          <form action={excluirDocumentosComId} className="mt-4 border-t border-white/5 pt-4">
+            <ConfirmSubmitButton
+              confirmMessage="Excluir todos os documentos anexados deste cliente? O histórico do processo é mantido para relatórios, mas os arquivos não podem ser recuperados depois."
+              className="text-xs font-medium text-red-400 hover:text-red-300 hover:underline"
+            >
+              Excluir todos os documentos (visto já aprovado)
+            </ConfirmSubmitButton>
+          </form>
         )}
       </section>
 
