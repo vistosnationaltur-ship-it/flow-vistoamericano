@@ -19,7 +19,9 @@ import {
   enviarDocumento,
   removerDocumento,
   enviarContrato,
+  excluirCliente,
 } from "@/app/actions";
+import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 
 const TIPOS_DOCUMENTO_SUGERIDOS = [
   "Foto do passaporte",
@@ -76,6 +78,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   const entrarNoGrupoComId = entrarNoGrupo.bind(null, cliente.id);
   const sairDoGrupoComId = sairDoGrupo.bind(null, cliente.id);
   const enviarContratoComId = enviarContrato.bind(null, cliente.id);
+  const excluirComId = excluirCliente.bind(null, cliente.id);
 
   // Data em que cada etapa foi atingida, pela ocorrência mais recente
   // no histórico (que já vem ordenado do mais novo pro mais antigo).
@@ -96,9 +99,19 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
           </p>
           {cliente.endereco && <p className="text-sm text-zinc-500">{cliente.endereco}</p>}
         </div>
-        <Link href={`/clientes/${cliente.id}/editar`} className={BTN_OUTLINE}>
-          Editar dados
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href={`/clientes/${cliente.id}/editar`} className={BTN_OUTLINE}>
+            Editar dados
+          </Link>
+          <form action={excluirComId}>
+            <ConfirmSubmitButton
+              confirmMessage={`Excluir ${cliente.nome} definitivamente? Isso apaga todo o histórico e documentos anexados. Essa ação não pode ser desfeita.`}
+              className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-medium text-red-300 transition-colors hover:bg-red-500/10"
+            >
+              Excluir cliente
+            </ConfirmSubmitButton>
+          </form>
+        </div>
       </div>
 
       <section className={CARD}>

@@ -279,6 +279,19 @@ export async function removerDocumento(documentoId: string, formData: FormData) 
   if (clienteId) revalidatePath(`/clientes/${clienteId}`);
 }
 
+export async function excluirCliente(clienteId: string) {
+  const documentos = await prisma.documento.findMany({
+    where: { clienteId },
+    select: { url: true },
+  });
+  await Promise.all(documentos.map((doc) => del(doc.url)));
+
+  await prisma.cliente.delete({ where: { id: clienteId } });
+
+  revalidatePath("/clientes");
+  redirect("/clientes");
+}
+
 export async function atualizarObservacoes(clienteId: string, formData: FormData) {
   const observacoes = stringOrNull(formData.get("observacoes"));
 
