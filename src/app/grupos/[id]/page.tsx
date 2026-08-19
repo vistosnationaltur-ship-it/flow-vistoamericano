@@ -24,21 +24,26 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold">Família {grupo.nome}</h1>
-        <p className="text-sm text-zinc-500">
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">
+          Família {grupo.nome}
+        </h1>
+        <p className="mt-1 text-sm text-zinc-500">
           {grupo.clientes.length} pessoa{grupo.clientes.length === 1 ? "" : "s"} nesse grupo
         </p>
       </div>
 
-      <section className="rounded-md border border-zinc-200 bg-white p-6">
+      <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
         <h2 className="mb-4 text-sm font-semibold text-zinc-500">Membros da família</h2>
-        <ul className="flex flex-col divide-y divide-zinc-100">
+        <ul className="flex flex-col divide-y divide-white/5">
           {grupo.clientes.map((c) => (
             <li key={c.id} className="flex items-center justify-between py-3 text-sm">
-              <Link href={`/clientes/${c.id}`} className="font-medium text-zinc-900 hover:underline">
+              <Link
+                href={`/clientes/${c.id}`}
+                className="font-medium text-zinc-100 hover:text-indigo-300 hover:underline"
+              >
                 {c.nome}
               </Link>
-              <span className="rounded-full bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-700">
+              <span className="rounded-full bg-zinc-500/15 px-2.5 py-1 text-xs font-medium text-zinc-300">
                 {ETAPA_LABEL[c.etapaAtual]}
               </span>
             </li>
@@ -46,23 +51,25 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
         </ul>
       </section>
 
-      <section className="rounded-md border border-zinc-200 bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold text-zinc-500">Pagamento do serviço (família toda)</h2>
+      <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
+        <h2 className="mb-4 text-sm font-semibold text-zinc-500">
+          Pagamento do serviço (família toda)
+        </h2>
         <form action={financeiroComId} className="flex flex-col gap-3">
           <div className="flex flex-wrap items-end gap-3">
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="text-zinc-600">Valor total (R$)</span>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="text-zinc-400">Valor total (R$)</span>
               <input
                 type="number"
                 step="0.01"
                 min="0"
                 name="valorServico"
                 defaultValue={grupo.valorServico ?? ""}
-                className="w-32 rounded-md border border-zinc-300 px-3 py-2"
+                className="w-32 rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
               />
             </label>
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="text-zinc-600">Pago em</span>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="text-zinc-400">Pago em</span>
               <input
                 type="date"
                 name="dataPagamentoServico"
@@ -71,26 +78,26 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
                     ? new Date(grupo.dataPagamentoServico).toISOString().slice(0, 10)
                     : ""
                 }
-                className="rounded-md border border-zinc-300 px-3 py-2"
+                className="rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
               />
             </label>
           </div>
 
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-zinc-600">
+          <label className="flex flex-col gap-1.5 text-sm">
+            <span className="text-zinc-400">
               Observações financeiras (ex: por que o valor é maior)
             </span>
             <textarea
               name="observacoesFinanceiras"
               rows={2}
               defaultValue={grupo.observacoesFinanceiras ?? ""}
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-sm text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
             />
           </label>
 
           <button
             type="submit"
-            className="self-start rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+            className="self-start rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
           >
             Salvar
           </button>

@@ -69,33 +69,35 @@ export default async function FinanceiroPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold">Financeiro</h1>
-        <p className="text-sm text-zinc-500">Valor do serviço de assessoria (não inclui taxa MRV)</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Financeiro</h1>
+        <p className="mt-1 text-sm text-zinc-500">
+          Valor do serviço de assessoria (não inclui taxa MRV)
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-md border border-zinc-200 bg-white p-4">
-          <span className="text-2xl font-semibold text-zinc-900">
+        <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-5">
+          <span className="text-2xl font-semibold tabular-nums text-zinc-100">
             {formatarReais(totalMes)}
           </span>
-          <p className="text-sm text-zinc-500">Faturado este mês</p>
+          <p className="mt-1 text-sm text-zinc-500">Faturado este mês</p>
         </div>
-        <div className="rounded-md border border-zinc-200 bg-white p-4">
-          <span className="text-2xl font-semibold text-zinc-900">
+        <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-5">
+          <span className="text-2xl font-semibold tabular-nums text-zinc-100">
             {formatarReais(totalAno)}
           </span>
-          <p className="text-sm text-zinc-500">Faturado este ano</p>
+          <p className="mt-1 text-sm text-zinc-500">Faturado este ano</p>
         </div>
-        <div className="rounded-md border border-zinc-200 bg-white p-4">
-          <span className="text-2xl font-semibold text-zinc-900">
+        <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/[0.06] p-5">
+          <span className="text-2xl font-semibold tabular-nums text-indigo-200">
             {formatarReais(totalGeral)}
           </span>
-          <p className="text-sm text-zinc-500">Faturado no total</p>
+          <p className="mt-1 text-sm text-zinc-500">Faturado no total</p>
         </div>
       </div>
 
       {mesesOrdenados.length > 0 && (
-        <section className="rounded-md border border-zinc-200 bg-white p-6">
+        <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
           <h2 className="mb-4 text-sm font-semibold text-zinc-500">Por mês</h2>
           <table className="w-full text-sm">
             <tbody>
@@ -107,9 +109,11 @@ export default async function FinanceiroPage() {
                 );
                 const nomeMes = nomeMesBruto.charAt(0).toUpperCase() + nomeMesBruto.slice(1);
                 return (
-                  <tr key={chave} className="border-t border-zinc-100">
-                    <td className="py-2 text-zinc-600">{nomeMes}</td>
-                    <td className="py-2 text-right font-medium">{formatarReais(valor)}</td>
+                  <tr key={chave} className="border-t border-white/5">
+                    <td className="py-2.5 text-zinc-400">{nomeMes}</td>
+                    <td className="py-2.5 text-right font-medium text-zinc-100">
+                      {formatarReais(valor)}
+                    </td>
                   </tr>
                 );
               })}
@@ -118,37 +122,44 @@ export default async function FinanceiroPage() {
         </section>
       )}
 
-      <section className="rounded-md border border-zinc-200 bg-white p-6">
+      <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
         <h2 className="mb-4 text-sm font-semibold text-zinc-500">Transações</h2>
         {transacoes.length === 0 ? (
           <p className="text-sm text-zinc-500">
             Nenhum pagamento de serviço registrado ainda.
           </p>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="text-left text-zinc-500">
-              <tr>
-                <th className="pb-2 font-medium">Cliente / família</th>
-                <th className="pb-2 font-medium">Pago em</th>
-                <th className="pb-2 text-right font-medium">Valor</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transacoes.map((t) => (
-                <tr key={t.id} className="border-t border-zinc-100">
-                  <td className="py-2">
-                    <Link href={t.href} className="text-zinc-900 hover:underline">
-                      {t.label}
-                    </Link>
-                  </td>
-                  <td className="py-2 text-zinc-500">
-                    {t.data ? formatarDataBr(t.data) : "sem data"}
-                  </td>
-                  <td className="py-2 text-right font-medium">{formatarReais(t.valor)}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-left text-zinc-500">
+                <tr className="border-b border-white/10">
+                  <th className="pb-2 font-medium">Cliente / família</th>
+                  <th className="pb-2 font-medium">Pago em</th>
+                  <th className="pb-2 text-right font-medium">Valor</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {transacoes.map((t) => (
+                  <tr key={t.id} className="border-t border-white/5">
+                    <td className="py-2.5">
+                      <Link
+                        href={t.href}
+                        className="text-zinc-100 hover:text-indigo-300 hover:underline"
+                      >
+                        {t.label}
+                      </Link>
+                    </td>
+                    <td className="py-2.5 text-zinc-500">
+                      {t.data ? formatarDataBr(t.data) : "sem data"}
+                    </td>
+                    <td className="py-2.5 text-right font-medium text-zinc-100">
+                      {formatarReais(t.valor)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
     </div>

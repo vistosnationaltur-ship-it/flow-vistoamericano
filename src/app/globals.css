@@ -1,15 +1,36 @@
 @import "tailwindcss";
 
 /*
- * Esse projeto usa só tema claro (as cores vêm das classes Tailwind no
- * layout, ex. bg-zinc-50/text-zinc-900). `color-scheme: light` evita que o
- * navegador force paleta escura nos controles nativos de formulário
- * (select, input) quando o usuário tem dark mode ligado no SO/navegador.
+ * Esse projeto usa dark mode fixo como padrão (não segue o tema do SO nem
+ * tem toggle) — decisão de design pra parecer um SaaS moderno (Linear /
+ * Vercel Dashboard). `color-scheme: dark` faz os controles nativos de
+ * formulário (select, input, date picker) renderizarem no tema escuro em
+ * vez de forçar branco.
  */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Scrollbar discreta, coerente com o tema escuro (Firefox + WebKit). */
+* {
+  scrollbar-color: rgb(63 63 70) transparent;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(63 63 70);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }

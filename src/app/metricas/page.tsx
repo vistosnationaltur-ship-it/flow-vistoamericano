@@ -97,45 +97,49 @@ export default async function MetricasPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold">Métricas</h1>
-        <p className="text-sm text-zinc-500">Funil e tempo médio do processo</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Métricas</h1>
+        <p className="mt-1 text-sm text-zinc-500">Funil e tempo médio do processo</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-md border border-zinc-200 bg-white p-4">
-          <span className="text-2xl font-semibold text-zinc-900">
+        <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-5">
+          <span className="text-2xl font-semibold tabular-nums text-zinc-100">
             {mediaTotal != null ? `${mediaTotal.toFixed(0)} dias` : "—"}
           </span>
-          <p className="text-sm text-zinc-500">Cadastro até entrevista realizada (média)</p>
+          <p className="mt-1 text-sm text-zinc-500">Cadastro até entrevista realizada (média)</p>
         </div>
-        <div className="rounded-md border border-zinc-200 bg-white p-4">
-          <span className="text-2xl font-semibold text-zinc-900">
+        <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/[0.06] p-5">
+          <span className="text-2xl font-semibold tabular-nums text-indigo-200">
             {taxaAprovacao != null ? `${taxaAprovacao.toFixed(0)}%` : "—"}
           </span>
-          <p className="text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500">
             Taxa de aprovação ({aprovados} aprovados / {negados} negados)
           </p>
         </div>
-        <div className="rounded-md border border-zinc-200 bg-white p-4">
-          <span className="text-2xl font-semibold text-zinc-900">{clientes.length}</span>
-          <p className="text-sm text-zinc-500">Clientes no total</p>
+        <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-5">
+          <span className="text-2xl font-semibold tabular-nums text-zinc-100">
+            {clientes.length}
+          </span>
+          <p className="mt-1 text-sm text-zinc-500">Clientes no total</p>
         </div>
       </div>
 
       {gargalos.length > 0 && (
-        <section className="rounded-md border border-zinc-200 bg-white p-6">
+        <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
           <h2 className="mb-4 text-sm font-semibold text-zinc-500">
             Gargalo agora (média de dias parado, por etapa atual)
           </h2>
           <table className="w-full text-sm">
             <tbody>
               {gargalos.map((g) => (
-                <tr key={g.etapa} className="border-t border-zinc-100">
-                  <td className="py-2 text-zinc-600">{ETAPA_LABEL[g.etapa]}</td>
-                  <td className="py-2 text-zinc-400">
+                <tr key={g.etapa} className="border-t border-white/5">
+                  <td className="py-2.5 text-zinc-400">{ETAPA_LABEL[g.etapa]}</td>
+                  <td className="py-2.5 text-zinc-500">
                     {g.quantidade} cliente{g.quantidade === 1 ? "" : "s"}
                   </td>
-                  <td className="py-2 text-right font-medium">{g.mediaDias.toFixed(1)} dias</td>
+                  <td className="py-2.5 text-right font-medium text-zinc-100">
+                    {g.mediaDias.toFixed(1)} dias
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -143,32 +147,34 @@ export default async function MetricasPage() {
         </section>
       )}
 
-      <section className="rounded-md border border-zinc-200 bg-white p-6">
+      <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
         <h2 className="mb-4 text-sm font-semibold text-zinc-500">
           Tempo médio de cada etapa (histórico)
         </h2>
-        <table className="w-full text-sm">
-          <thead className="text-left text-zinc-500">
-            <tr>
-              <th className="pb-2 font-medium">Transição</th>
-              <th className="pb-2 font-medium">Amostras</th>
-              <th className="pb-2 text-right font-medium">Média</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transicoes.map((t) => (
-              <tr key={`${t.de}-${t.para}`} className="border-t border-zinc-100">
-                <td className="py-2 text-zinc-700">
-                  {ETAPA_LABEL[t.de]} → {ETAPA_LABEL[t.para]}
-                </td>
-                <td className="py-2 text-zinc-400">{t.amostras}</td>
-                <td className="py-2 text-right font-medium">
-                  {t.mediaDias != null ? `${t.mediaDias.toFixed(1)} dias` : "—"}
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-left text-zinc-500">
+              <tr className="border-b border-white/10">
+                <th className="pb-2 font-medium">Transição</th>
+                <th className="pb-2 font-medium">Amostras</th>
+                <th className="pb-2 text-right font-medium">Média</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {transicoes.map((t) => (
+                <tr key={`${t.de}-${t.para}`} className="border-t border-white/5">
+                  <td className="py-2.5 text-zinc-300">
+                    {ETAPA_LABEL[t.de]} → {ETAPA_LABEL[t.para]}
+                  </td>
+                  <td className="py-2.5 text-zinc-500">{t.amostras}</td>
+                  <td className="py-2.5 text-right font-medium text-zinc-100">
+                    {t.mediaDias != null ? `${t.mediaDias.toFixed(1)} dias` : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   );

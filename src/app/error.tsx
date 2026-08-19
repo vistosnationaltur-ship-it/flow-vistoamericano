@@ -8,12 +8,12 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="rounded-md border border-red-200 bg-red-50 p-6 text-sm text-red-700">
+    <div className="rounded-2xl border border-red-500/20 bg-red-500/[0.06] p-6 text-sm text-red-300">
       <p className="font-medium">Algo deu errado</p>
-      <p className="mt-1">{error.message}</p>
+      <p className="mt-1 text-red-400/80">{error.message}</p>
       <button
         onClick={reset}
-        className="mt-4 rounded-md border border-red-300 px-4 py-2 font-medium hover:bg-red-100"
+        className="mt-4 rounded-lg border border-red-500/30 px-4 py-2 font-medium text-red-300 transition-colors hover:bg-red-500/10"
       >
         Tentar de novo
       </button>
