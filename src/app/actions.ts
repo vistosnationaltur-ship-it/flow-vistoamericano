@@ -114,6 +114,17 @@ export async function definirPagamentoMrv(clienteId: string, formData: FormData)
   revalidatePath(`/clientes/${clienteId}`);
 }
 
+export async function definirNumeroDs160(clienteId: string, formData: FormData) {
+  const numeroDs160 = stringOrNull(formData.get("numeroDs160"));
+
+  await prisma.cliente.update({
+    where: { id: clienteId },
+    data: { numeroDs160 },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+}
+
 export async function atualizarObservacoes(clienteId: string, formData: FormData) {
   const observacoes = stringOrNull(formData.get("observacoes"));
 

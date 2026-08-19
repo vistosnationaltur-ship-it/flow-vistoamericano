@@ -7,6 +7,7 @@ import {
   marcarVistoNegado,
   definirDataEntrevista,
   definirPagamentoMrv,
+  definirNumeroDs160,
   atualizarObservacoes,
 } from "@/app/actions";
 
@@ -28,7 +29,15 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   const negarComId = marcarVistoNegado.bind(null, cliente.id);
   const dataEntrevistaComId = definirDataEntrevista.bind(null, cliente.id);
   const pagamentoMrvComId = definirPagamentoMrv.bind(null, cliente.id);
+  const numeroDs160ComId = definirNumeroDs160.bind(null, cliente.id);
   const observacoesComId = atualizarObservacoes.bind(null, cliente.id);
+
+  // Data em que cada etapa foi atingida, pela ocorrência mais recente
+  // no histórico (que já vem ordenado do mais novo pro mais antigo).
+  const dataPorEtapa = new Map<string, Date>();
+  for (const h of cliente.historico) {
+    if (!dataPorEtapa.has(h.etapa)) dataPorEtapa.set(h.etapa, h.criadoEm);
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -50,21 +59,29 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
             const atual = ORDEM_ETAPAS.indexOf(cliente.etapaAtual);
             const concluida = i <= atual || cliente.etapaAtual === "VISTO_NEGADO";
             const ehAtual = etapa === cliente.etapaAtual;
+            const data = dataPorEtapa.get(etapa);
             return (
               <li
                 key={etapa}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm ${
+                className={`flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm ${
                   ehAtual ? "bg-zinc-100 font-medium" : "text-zinc-500"
                 }`}
               >
-                <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-xs ${
-                    concluida ? "bg-zinc-900 text-white" : "border border-zinc-300"
-                  }`}
-                >
-                  {concluida ? "✓" : ""}
+                <span className="flex items-center gap-3">
+                  <span
+                    className={`flex h-5 w-5 items-center justify-center rounded-full text-xs ${
+                      concluida ? "bg-zinc-900 text-white" : "border border-zinc-300"
+                    }`}
+                  >
+                    {concluida ? "✓" : ""}
+                  </span>
+                  {ETAPA_LABEL[etapa]}
                 </span>
-                {ETAPA_LABEL[etapa]}
+                {data && (
+                  <span className="text-xs text-zinc-400">
+                    {data.toLocaleDateString("pt-BR")}
+                  </span>
+                )}
               </li>
             );
           })}
@@ -130,6 +147,28 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
                   ? new Date(cliente.dataEntrevista).toISOString().slice(0, 10)
                   : ""
               }
+              className="rounded-md border border-zinc-300 px-3 py-2"
+            />
+          </label>
+          <button
+            type="submit"
+            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+          >
+            Salvar
+          </button>
+        </form>
+      </section>
+
+      <section className="rounded-md border border-zinc-200 bg-white p-6">
+        <h2 className="mb-4 text-sm font-semibold text-zinc-500">DS-160 preenchido no consulado</h2>
+        <form action={numeroDs160ComId} className="flex items-end gap-3">
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-zinc-600">Número do DS-160</span>
+            <input
+              type="text"
+              name="numeroDs160"
+              defaultValue={cliente.numeroDs160 ?? ""}
+              placeholder="Ex: AA00XXXXXX"
               className="rounded-md border border-zinc-300 px-3 py-2"
             />
           </label>
