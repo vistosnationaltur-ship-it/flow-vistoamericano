@@ -1,9 +1,11 @@
 import { criarCliente } from "@/app/actions";
 import { CampoData } from "@/components/CampoData";
+import { VoltarLink } from "@/components/VoltarLink";
 
 export default function NovoClientePage() {
   return (
     <div className="flex flex-col gap-6">
+      <VoltarLink href="/clientes" label="Voltar pra lista de clientes" />
       <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Novo cliente</h1>
 
       <form

@@ -26,6 +26,7 @@ import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { sessaoAtual } from "@/lib/auth";
 import { CampoData } from "@/components/CampoData";
 import { CampoMoeda } from "@/components/CampoMoeda";
+import { VoltarLink } from "@/components/VoltarLink";
 
 const TIPOS_DOCUMENTO_SUGERIDOS = [
   "Foto do passaporte",
@@ -97,6 +98,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
 
   return (
     <div className="flex flex-col gap-6">
+      <VoltarLink href="/clientes" label="Voltar pra lista de clientes" />
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">{cliente.nome}</h1>

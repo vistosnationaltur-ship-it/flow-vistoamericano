@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { atualizarDadosCliente } from "@/app/actions";
 import { CampoData } from "@/components/CampoData";
+import { VoltarLink } from "@/components/VoltarLink";
 
 export default async function EditarClientePage(props: PageProps<"/clientes/[id]/editar">) {
   const { id } = await props.params;
@@ -13,6 +14,7 @@ export default async function EditarClientePage(props: PageProps<"/clientes/[id]
 
   return (
     <div className="flex flex-col gap-6">
+      <VoltarLink href={`/clientes/${cliente.id}`} label="Voltar pra ficha do cliente" />
       <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Editar cliente</h1>
 
       <form

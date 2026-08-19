@@ -13,6 +13,7 @@ import { CampoData } from "@/components/CampoData";
 import { CampoMoeda } from "@/components/CampoMoeda";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { sessaoAtual } from "@/lib/auth";
+import { VoltarLink } from "@/components/VoltarLink";
 
 export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">) {
   const { id } = await props.params;
@@ -43,6 +44,7 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
 
   return (
     <div className="flex flex-col gap-6">
+      <VoltarLink href="/grupos" label="Voltar pra lista de famílias" />
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">
