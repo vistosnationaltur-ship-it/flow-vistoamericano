@@ -56,3 +56,6 @@ skills-lock.json
 
 # doc com credenciais/infraestrutura — não pode ir pro GitHub
 DOCUMENTACAO-INFRAESTRUTURA.md
+
+# backups do banco (dados reais de cliente: CPF, passaporte etc.) — não pode ir pro GitHub
+/backups/
