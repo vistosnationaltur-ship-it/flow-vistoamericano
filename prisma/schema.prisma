@@ -75,8 +75,26 @@ model Cliente {
   atualizadoEm DateTime @updatedAt
 
   historico HistoricoEtapa[]
+  documentos Documento[]
 
   @@index([grupoId])
+}
+
+model Documento {
+  id        String   @id @default(cuid())
+  clienteId String
+  cliente   Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  // Tipo é texto livre em vez de enum pra não travar cada assessoria
+  // num conjunto fixo de documentos (ex: "Foto do passaporte",
+  // "Comprovante DS-160", "Comprovante financeiro").
+  tipo        String
+  nomeArquivo String
+  url         String
+
+  criadoEm DateTime @default(now())
+
+  @@index([clienteId])
 }
 
 model HistoricoEtapa {

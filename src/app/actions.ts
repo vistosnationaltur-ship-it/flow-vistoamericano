@@ -5,6 +5,7 @@ import { EtapaProcesso } from "@/generated/prisma/client";
 import { proximaEtapa, etapaAnterior } from "@/lib/etapas";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { put, del } from "@vercel/blob";
 
 function stringOrNull(value: FormDataEntryValue | null): string | null {
   const v = (value ?? "").toString().trim();
@@ -193,6 +194,46 @@ export async function definirNumeroDs160(clienteId: string, formData: FormData) 
   });
 
   revalidatePath(`/clientes/${clienteId}`);
+}
+
+export async function enviarDocumento(clienteId: string, formData: FormData) {
+  const tipo = stringOrNull(formData.get("tipo"));
+  const arquivo = formData.get("arquivo");
+
+  if (!tipo) {
+    throw new Error("Escolha o tipo do documento.");
+  }
+  if (!(arquivo instanceof File) || arquivo.size === 0) {
+    throw new Error("Selecione um arquivo.");
+  }
+  if (arquivo.size > 10 * 1024 * 1024) {
+    throw new Error("Arquivo maior que 10MB — comprima ou envie um arquivo menor.");
+  }
+
+  const blob = await put(`clientes/${clienteId}/${Date.now()}-${arquivo.name}`, arquivo, {
+    access: "private",
+  });
+
+  await prisma.documento.create({
+    data: {
+      clienteId,
+      tipo,
+      nomeArquivo: arquivo.name,
+      url: blob.url,
+    },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+}
+
+export async function removerDocumento(documentoId: string, formData: FormData) {
+  const clienteId = stringOrNull(formData.get("clienteId"));
+
+  const documento = await prisma.documento.findUniqueOrThrow({ where: { id: documentoId } });
+  await del(documento.url);
+  await prisma.documento.delete({ where: { id: documentoId } });
+
+  if (clienteId) revalidatePath(`/clientes/${clienteId}`);
 }
 
 export async function atualizarObservacoes(clienteId: string, formData: FormData) {

@@ -16,14 +16,27 @@ import {
   criarGrupoComCliente,
   entrarNoGrupo,
   sairDoGrupo,
+  enviarDocumento,
+  removerDocumento,
 } from "@/app/actions";
+
+const TIPOS_DOCUMENTO_SUGERIDOS = [
+  "Foto do passaporte",
+  "Comprovante DS-160",
+  "Comprovante financeiro",
+  "Comprovante de vínculo (emprego/estudo)",
+];
 
 export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id]">) {
   const { id } = await props.params;
 
   const cliente = await prisma.cliente.findUnique({
     where: { id },
-    include: { historico: { orderBy: { criadoEm: "desc" } }, grupo: { include: { clientes: true } } },
+    include: {
+      historico: { orderBy: { criadoEm: "desc" } },
+      grupo: { include: { clientes: true } },
+      documentos: { orderBy: { criadoEm: "desc" } },
+    },
   });
 
   if (!cliente) notFound();
@@ -38,6 +51,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   const finalizado =
     cliente.etapaAtual === "VISTO_NEGADO" || cliente.etapaAtual === "PASSAPORTE_DEVOLVIDO";
 
+  const enviarDocumentoComId = enviarDocumento.bind(null, cliente.id);
   const avancarComId = avancarEtapa.bind(null, cliente.id);
   const voltarComId = voltarEtapa.bind(null, cliente.id);
   const negarComId = marcarVistoNegado.bind(null, cliente.id);
@@ -302,6 +316,71 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
           </form>
         </section>
       )}
+
+      <section className="rounded-md border border-zinc-200 bg-white p-6">
+        <h2 className="mb-4 text-sm font-semibold text-zinc-500">Documentos</h2>
+
+        <form action={enviarDocumentoComId} className="flex flex-wrap items-end gap-3">
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-zinc-600">Tipo</span>
+            <input
+              type="text"
+              name="tipo"
+              list="tipos-documento"
+              required
+              placeholder="Ex: Foto do passaporte"
+              className="w-56 rounded-md border border-zinc-300 px-3 py-2"
+            />
+            <datalist id="tipos-documento">
+              {TIPOS_DOCUMENTO_SUGERIDOS.map((t) => (
+                <option key={t} value={t} />
+              ))}
+            </datalist>
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-zinc-600">Arquivo (até 10MB)</span>
+            <input
+              type="file"
+              name="arquivo"
+              required
+              accept="image/*,application/pdf"
+              className="rounded-md border border-zinc-300 px-3 py-2 text-sm"
+            />
+          </label>
+          <button
+            type="submit"
+            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+          >
+            Enviar
+          </button>
+        </form>
+
+        {cliente.documentos.length > 0 && (
+          <ul className="mt-4 flex flex-col divide-y divide-zinc-100">
+            {cliente.documentos.map((doc) => (
+              <li key={doc.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+                <a
+                  href={`/api/documentos/${doc.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-900 hover:underline"
+                >
+                  {doc.tipo} — {doc.nomeArquivo}
+                </a>
+                <form action={removerDocumento.bind(null, doc.id)}>
+                  <input type="hidden" name="clienteId" value={cliente.id} />
+                  <button
+                    type="submit"
+                    className="text-xs font-medium text-red-600 hover:underline"
+                  >
+                    Remover
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section className="rounded-md border border-zinc-200 bg-white p-6">
         <h2 className="mb-4 text-sm font-semibold text-zinc-500">Dados do cliente</h2>
