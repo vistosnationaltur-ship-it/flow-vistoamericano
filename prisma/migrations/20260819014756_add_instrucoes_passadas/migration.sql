@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "EtapaProcesso" ADD VALUE 'INSTRUCOES_PASSADAS';

@@ -9,6 +9,7 @@ import {
   estaAtrasado,
   diasParaEntrevista,
   precisaLembrarEntrevista,
+  precisaLembrarInstrucoes,
 } from "@/lib/etapas";
 import { formatarDataBr } from "@/lib/formatar";
 import type { EtapaProcesso } from "@/generated/prisma/client";
@@ -43,6 +44,10 @@ export default async function PainelPage() {
     .filter((c) => precisaLembrarEntrevista(c.etapaAtual, diasParaEntrevista(c.dataEntrevista)))
     .sort((a, b) => (a.dataEntrevista as Date).getTime() - (b.dataEntrevista as Date).getTime());
 
+  const instrucoesPendentes = comEntrevistaProxima
+    .filter((c) => precisaLembrarInstrucoes(c.etapaAtual, diasParaEntrevista(c.dataEntrevista)))
+    .sort((a, b) => (a.dataEntrevista as Date).getTime() - (b.dataEntrevista as Date).getTime());
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -71,6 +76,32 @@ export default async function PainelPage() {
                   <span className="text-amber-700">
                     {" "}
                     — entrevista {quando} ({formatarDataBr(c.dataEntrevista)})
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {instrucoesPendentes.length > 0 && (
+        <div className="rounded-md border border-blue-200 bg-blue-50 p-4">
+          <p className="text-sm font-medium text-blue-800">
+            📋 {instrucoesPendentes.length} cliente
+            {instrucoesPendentes.length === 1 ? "" : "s"} precisa
+            {instrucoesPendentes.length === 1 ? "" : "m"} receber instruções pra entrevista
+          </p>
+          <ul className="mt-2 flex flex-col gap-1">
+            {instrucoesPendentes.map((c) => {
+              const dias = diasParaEntrevista(c.dataEntrevista)!;
+              return (
+                <li key={c.id} className="text-sm">
+                  <Link href={`/clientes/${c.id}`} className="text-blue-800 hover:underline">
+                    {c.nome}
+                  </Link>
+                  <span className="text-blue-700">
+                    {" "}
+                    — entrevista em {dias} dias ({formatarDataBr(c.dataEntrevista)})
                   </span>
                 </li>
               );

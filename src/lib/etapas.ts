@@ -7,6 +7,7 @@ export const ORDEM_ETAPAS: EtapaProcesso[] = [
   "BOLETO_MRV_GERADO",
   "PAGAMENTO_MRV",
   "AGENDAMENTO_ENTREVISTA",
+  "INSTRUCOES_PASSADAS",
   "ENTREVISTA_REALIZADA",
   "VISTO_APROVADO",
   "PASSAPORTE_DEVOLVIDO",
@@ -19,6 +20,7 @@ export const ETAPA_LABEL: Record<EtapaProcesso, string> = {
   BOLETO_MRV_GERADO: "Entrada no consulado + boleto MRV gerado",
   PAGAMENTO_MRV: "Pagamento da taxa (MRV) confirmado",
   AGENDAMENTO_ENTREVISTA: "Entrevista agendada",
+  INSTRUCOES_PASSADAS: "Instruções passadas",
   ENTREVISTA_REALIZADA: "Entrevista realizada",
   VISTO_APROVADO: "Visto aprovado",
   VISTO_NEGADO: "Visto negado",
@@ -101,5 +103,22 @@ export function precisaLembrarEntrevista(
     diasParaEntrevista >= 0 &&
     diasParaEntrevista <= DIAS_LEMBRETE_ENTREVISTA &&
     ETAPAS_ANTES_DA_ENTREVISTA.includes(etapa)
+  );
+}
+
+export const DIAS_LEMBRETE_INSTRUCOES = 15;
+
+// Só faz sentido lembrar de passar instruções enquanto o cliente
+// ainda estiver "esperando" pra isso, ou seja, na etapa logo antes de
+// "Instruções passadas".
+export function precisaLembrarInstrucoes(
+  etapa: EtapaProcesso,
+  diasParaEntrevista: number | null,
+): boolean {
+  return (
+    etapa === "AGENDAMENTO_ENTREVISTA" &&
+    diasParaEntrevista != null &&
+    diasParaEntrevista >= 0 &&
+    diasParaEntrevista <= DIAS_LEMBRETE_INSTRUCOES
   );
 }
