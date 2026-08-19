@@ -7,7 +7,10 @@ import {
   dataEntradaEtapa,
   diasParado,
   estaAtrasado,
+  diasParaEntrevista,
+  precisaLembrarEntrevista,
 } from "@/lib/etapas";
+import { formatarDataBr } from "@/lib/formatar";
 import type { Cliente, EtapaProcesso, HistoricoEtapa, Prisma } from "@/generated/prisma/client";
 
 const TODAS_ETAPAS: EtapaProcesso[] = [...ORDEM_ETAPAS, "VISTO_NEGADO"];
@@ -158,9 +161,21 @@ export default async function ClientesPage(props: PageProps<"/clientes">) {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-zinc-500">
-                      {cliente.dataEntrevista
-                        ? new Date(cliente.dataEntrevista).toLocaleDateString("pt-BR")
-                        : "—"}
+                      {cliente.dataEntrevista ? (
+                        <span className="flex items-center gap-2">
+                          {formatarDataBr(cliente.dataEntrevista)}
+                          {precisaLembrarEntrevista(
+                            cliente.etapaAtual,
+                            diasParaEntrevista(cliente.dataEntrevista),
+                          ) && (
+                            <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">
+                              📅 em breve
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        "—"
+                      )}
                     </td>
                   </tr>
                 );

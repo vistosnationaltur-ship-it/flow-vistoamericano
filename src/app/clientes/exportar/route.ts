@@ -1,6 +1,7 @@
 import ExcelJS from "exceljs";
 import { prisma } from "@/lib/prisma";
 import { ETAPA_LABEL } from "@/lib/etapas";
+import { formatarDataBr } from "@/lib/formatar";
 import type { EtapaProcesso, Prisma } from "@/generated/prisma/client";
 
 export async function GET(request: Request) {
@@ -48,16 +49,12 @@ export async function GET(request: Request) {
       email: cliente.email ?? "",
       telefone: cliente.telefone ?? "",
       etapa: ETAPA_LABEL[cliente.etapaAtual],
-      dataEntrevista: cliente.dataEntrevista
-        ? new Date(cliente.dataEntrevista).toLocaleDateString("pt-BR")
-        : "",
+      dataEntrevista: cliente.dataEntrevista ? formatarDataBr(cliente.dataEntrevista) : "",
       valorTaxaMrv: cliente.valorTaxaMrv ?? "",
-      dataPagamentoMrv: cliente.dataPagamentoMrv
-        ? new Date(cliente.dataPagamentoMrv).toLocaleDateString("pt-BR")
-        : "",
+      dataPagamentoMrv: cliente.dataPagamentoMrv ? formatarDataBr(cliente.dataPagamentoMrv) : "",
       numeroPassaporte: cliente.numeroPassaporte ?? "",
       validadePassaporte: cliente.validadePassaporte
-        ? new Date(cliente.validadePassaporte).toLocaleDateString("pt-BR")
+        ? formatarDataBr(cliente.validadePassaporte)
         : "",
       criadoEm: new Date(cliente.criadoEm).toLocaleDateString("pt-BR"),
     });

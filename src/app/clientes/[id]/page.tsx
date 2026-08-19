@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import type { HistoricoEtapa } from "@/generated/prisma/client";
 import { ETAPA_LABEL, ORDEM_ETAPAS, progresso, proximaEtapa, etapaAnterior } from "@/lib/etapas";
+import { formatarDataBr } from "@/lib/formatar";
 import {
   avancarEtapa,
   voltarEtapa,
@@ -49,7 +50,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
         <p className="text-sm text-zinc-500">
           {cliente.email ?? "sem e-mail"} · {cliente.telefone ?? "sem telefone"}
           {cliente.dataNascimento &&
-            ` · nasc. ${cliente.dataNascimento.toLocaleDateString("pt-BR")}`}
+            ` · nasc. ${formatarDataBr(cliente.dataNascimento)}`}
         </p>
         {cliente.endereco && <p className="text-sm text-zinc-500">{cliente.endereco}</p>}
       </div>
@@ -238,11 +239,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
           <Info label="Passaporte" value={cliente.numeroPassaporte} />
           <Info
             label="Validade do passaporte"
-            value={
-              cliente.validadePassaporte
-                ? new Date(cliente.validadePassaporte).toLocaleDateString("pt-BR")
-                : null
-            }
+            value={cliente.validadePassaporte ? formatarDataBr(cliente.validadePassaporte) : null}
           />
           <Info
             label="Cadastrado em"

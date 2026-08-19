@@ -69,3 +69,37 @@ export function estaAtrasado(etapa: EtapaProcesso, dias: number | null): boolean
   const limite = LIMITE_DIAS_ALERTA[etapa];
   return limite != null && dias != null && dias > limite;
 }
+
+// Quantos dias faltam pra data da entrevista (negativo se já passou).
+// dataEntrevista é uma "data pura" salva como meia-noite UTC (ver
+// src/lib/formatar.ts) — por isso lê o dia em UTC em vez de horário
+// local, senão a conta erra por causa do fuso (Brasil é UTC-3).
+export function diasParaEntrevista(dataEntrevista: Date | null): number | null {
+  if (!dataEntrevista) return null;
+  const hoje = new Date();
+  const hojeUTC = Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  const dia = new Date(dataEntrevista);
+  const diaUTC = Date.UTC(dia.getUTCFullYear(), dia.getUTCMonth(), dia.getUTCDate());
+  return Math.round((diaUTC - hojeUTC) / (1000 * 60 * 60 * 24));
+}
+
+export const DIAS_LEMBRETE_ENTREVISTA = 2;
+
+// Etapas em que a entrevista ainda não aconteceu — só nessas faz
+// sentido lembrar.
+const ETAPAS_ANTES_DA_ENTREVISTA: EtapaProcesso[] = ORDEM_ETAPAS.slice(
+  0,
+  ORDEM_ETAPAS.indexOf("ENTREVISTA_REALIZADA"),
+);
+
+export function precisaLembrarEntrevista(
+  etapa: EtapaProcesso,
+  diasParaEntrevista: number | null,
+): boolean {
+  return (
+    diasParaEntrevista != null &&
+    diasParaEntrevista >= 0 &&
+    diasParaEntrevista <= DIAS_LEMBRETE_ENTREVISTA &&
+    ETAPAS_ANTES_DA_ENTREVISTA.includes(etapa)
+  );
+}

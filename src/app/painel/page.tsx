@@ -7,7 +7,10 @@ import {
   dataEntradaEtapa,
   diasParado,
   estaAtrasado,
+  diasParaEntrevista,
+  precisaLembrarEntrevista,
 } from "@/lib/etapas";
+import { formatarDataBr } from "@/lib/formatar";
 import type { EtapaProcesso } from "@/generated/prisma/client";
 
 const TODAS_ETAPAS: EtapaProcesso[] = [...ORDEM_ETAPAS, "VISTO_NEGADO"];
@@ -33,6 +36,13 @@ export default async function PainelPage() {
     estaAtrasado(c.etapaAtual, diasParado(dataEntradaEtapa(c.historico, c.etapaAtual))),
   );
 
+  const comEntrevistaProxima = await prisma.cliente.findMany({
+    where: { dataEntrevista: { not: null } },
+  });
+  const entrevistasProximas = comEntrevistaProxima
+    .filter((c) => precisaLembrarEntrevista(c.etapaAtual, diasParaEntrevista(c.dataEntrevista)))
+    .sort((a, b) => (a.dataEntrevista as Date).getTime() - (b.dataEntrevista as Date).getTime());
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -41,6 +51,33 @@ export default async function PainelPage() {
           {total} cliente{total === 1 ? "" : "s"} no total
         </p>
       </div>
+
+      {entrevistasProximas.length > 0 && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm font-medium text-amber-800">
+            📅 {entrevistasProximas.length} entrevista
+            {entrevistasProximas.length === 1 ? "" : "s"} nos próximos dias
+          </p>
+          <ul className="mt-2 flex flex-col gap-1">
+            {entrevistasProximas.map((c) => {
+              const dias = diasParaEntrevista(c.dataEntrevista)!;
+              const quando =
+                dias === 0 ? "hoje" : dias === 1 ? "amanhã" : `em ${dias} dias`;
+              return (
+                <li key={c.id} className="text-sm">
+                  <Link href={`/clientes/${c.id}`} className="text-amber-800 hover:underline">
+                    {c.nome}
+                  </Link>
+                  <span className="text-amber-700">
+                    {" "}
+                    — entrevista {quando} ({formatarDataBr(c.dataEntrevista)})
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
 
       {atrasados.length > 0 && (
         <div className="rounded-md border border-red-200 bg-red-50 p-4">
