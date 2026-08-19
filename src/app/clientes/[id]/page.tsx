@@ -18,6 +18,7 @@ import {
   sairDoGrupo,
   enviarDocumento,
   removerDocumento,
+  enviarContrato,
 } from "@/app/actions";
 
 const TIPOS_DOCUMENTO_SUGERIDOS = [
@@ -63,6 +64,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   const criarGrupoComId = criarGrupoComCliente.bind(null, cliente.id);
   const entrarNoGrupoComId = entrarNoGrupo.bind(null, cliente.id);
   const sairDoGrupoComId = sairDoGrupo.bind(null, cliente.id);
+  const enviarContratoComId = enviarContrato.bind(null, cliente.id);
 
   // Data em que cada etapa foi atingida, pela ocorrência mais recente
   // no histórico (que já vem ordenado do mais novo pro mais antigo).
@@ -140,8 +142,25 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
           </p>
         )}
 
+        {cliente.contratoEnviadoEm && (
+          <p className="mt-4 text-xs text-zinc-400">
+            Contrato enviado em {formatarDataBr(cliente.contratoEnviadoEm)}
+          </p>
+        )}
+
         {!finalizado && (
           <div className="mt-6 flex flex-wrap gap-3 border-t border-zinc-100 pt-4">
+            {cliente.etapaAtual === "CADASTRO" && (
+              <form action={enviarContratoComId}>
+                <button
+                  type="submit"
+                  className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                >
+                  Enviar contrato (WhatsApp)
+                </button>
+              </form>
+            )}
+
             {proxima && (
               <form action={avancarComId} className="flex gap-2">
                 <input

@@ -87,6 +87,49 @@ export async function atualizarDadosCliente(clienteId: string, formData: FormDat
   redirect(`/clientes/${clienteId}`);
 }
 
+export async function enviarContrato(clienteId: string) {
+  const webhookUrl = process.env.N8N_WEBHOOK_CONTRATO_URL;
+  if (!webhookUrl) {
+    throw new Error(
+      "Variável N8N_WEBHOOK_CONTRATO_URL não configurada — peça pro administrador do sistema configurar isso.",
+    );
+  }
+
+  const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
+
+  const resposta = await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      clienteId: cliente.id,
+      nome: cliente.nome,
+      email: cliente.email,
+      telefone: cliente.telefone,
+      cpf: cliente.cpf,
+    }),
+  });
+
+  if (!resposta.ok) {
+    throw new Error(
+      `O N8N respondeu com erro (status ${resposta.status}) — o contrato pode não ter sido enviado. Confira o workflow no N8N.`,
+    );
+  }
+
+  await prisma.cliente.update({
+    where: { id: clienteId },
+    data: {
+      contratoEnviadoEm: new Date(),
+      etapaAtual: cliente.etapaAtual === "CADASTRO" ? "CONTRATO_ENVIADO" : cliente.etapaAtual,
+      historico: {
+        create: { etapa: "CONTRATO_ENVIADO", observacao: "Contrato disparado via N8N" },
+      },
+    },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+  revalidatePath("/clientes");
+}
+
 export async function avancarEtapa(clienteId: string, formData: FormData) {
   const cliente = await prisma.cliente.findUniqueOrThrow({
     where: { id: clienteId },

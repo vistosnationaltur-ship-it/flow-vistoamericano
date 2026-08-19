@@ -12,6 +12,7 @@ datasource db {
 
 enum EtapaProcesso {
   CADASTRO
+  CONTRATO_ENVIADO
   RASCUNHO_DS160_SOLICITADO
   DS160_PREENCHIDO
   BOLETO_MRV_GERADO
@@ -56,6 +57,7 @@ model Cliente {
 
   etapaAtual   EtapaProcesso @default(CADASTRO)
   dataEntrevista DateTime?
+  contratoEnviadoEm DateTime?
 
   valorTaxaMrv    Float?
   dataPagamentoMrv DateTime?
