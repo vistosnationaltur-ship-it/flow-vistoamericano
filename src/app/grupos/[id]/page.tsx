@@ -7,8 +7,10 @@ import {
   atualizarFinanceiroGrupo,
   adicionarMembroAoGrupo,
   criarMembroFamilia,
+  excluirGrupo,
 } from "@/app/actions";
 import { CampoData } from "@/components/CampoData";
+import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 
 export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">) {
   const { id } = await props.params;
@@ -28,6 +30,7 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
   const financeiroComId = atualizarFinanceiroGrupo.bind(null, grupo.id);
   const adicionarMembroComId = adicionarMembroAoGrupo.bind(null, grupo.id);
   const criarMembroComId = criarMembroFamilia.bind(null, grupo.id);
+  const excluirGrupoComId = excluirGrupo.bind(null, grupo.id);
   const valorPorPessoa =
     grupo.valorServico && grupo.clientes.length > 0
       ? grupo.valorServico / grupo.clientes.length
@@ -35,13 +38,23 @@ export default async function GrupoDetalhePage(props: PageProps<"/grupos/[id]">)
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">
-          Família {grupo.nome}
-        </h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          {grupo.clientes.length} pessoa{grupo.clientes.length === 1 ? "" : "s"} nesse grupo
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">
+            Família {grupo.nome}
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            {grupo.clientes.length} pessoa{grupo.clientes.length === 1 ? "" : "s"} nesse grupo
+          </p>
+        </div>
+        <form action={excluirGrupoComId}>
+          <ConfirmSubmitButton
+            confirmMessage={`Excluir a família "${grupo.nome}"? Os clientes não são apagados, só deixam de fazer parte desse grupo (voltam a ter pagamento individual).`}
+            className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-medium text-red-300 transition-colors hover:bg-red-500/10"
+          >
+            Excluir família
+          </ConfirmSubmitButton>
+        </form>
       </div>
 
       <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">

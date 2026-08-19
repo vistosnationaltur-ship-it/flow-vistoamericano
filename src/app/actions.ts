@@ -279,6 +279,15 @@ export async function removerDocumento(documentoId: string, formData: FormData) 
   if (clienteId) revalidatePath(`/clientes/${clienteId}`);
 }
 
+export async function excluirGrupo(grupoId: string) {
+  await prisma.cliente.updateMany({ where: { grupoId }, data: { grupoId: null } });
+  await prisma.grupo.delete({ where: { id: grupoId } });
+
+  revalidatePath("/grupos");
+  revalidatePath("/clientes");
+  redirect("/grupos");
+}
+
 export async function excluirDocumentosCliente(clienteId: string) {
   const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
   if (cliente.etapaAtual !== "VISTO_APROVADO") {
