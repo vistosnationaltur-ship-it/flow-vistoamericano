@@ -57,6 +57,16 @@ export default async function EditarClientePage(props: PageProps<"/clientes/[id]
                   : ""
               }
             />
+            <Campo
+              label="Vencimento do visto atual (se for renovação)"
+              name="dataVencimentoVistoAtual"
+              type="date"
+              defaultValue={
+                cliente.dataVencimentoVistoAtual
+                  ? new Date(cliente.dataVencimentoVistoAtual).toISOString().slice(0, 10)
+                  : ""
+              }
+            />
           </div>
         </section>
 

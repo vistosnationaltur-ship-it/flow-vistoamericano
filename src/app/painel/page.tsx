@@ -8,8 +8,10 @@ import {
   diasParado,
   estaAtrasado,
   diasParaEntrevista,
+  diasParaData,
   precisaLembrarEntrevista,
   precisaLembrarInstrucoes,
+  precisaAlertarVencimento,
 } from "@/lib/etapas";
 import { formatarDataBr } from "@/lib/formatar";
 import type { EtapaProcesso } from "@/generated/prisma/client";
@@ -47,6 +49,37 @@ export default async function PainelPage() {
   const instrucoesPendentes = comEntrevistaProxima
     .filter((c) => precisaLembrarInstrucoes(c.etapaAtual, diasParaEntrevista(c.dataEntrevista)))
     .sort((a, b) => (a.dataEntrevista as Date).getTime() - (b.dataEntrevista as Date).getTime());
+
+  const comDocumentoParaChecar = await prisma.cliente.findMany({
+    where: {
+      OR: [{ validadePassaporte: { not: null } }, { dataVencimentoVistoAtual: { not: null } }],
+    },
+  });
+  type AlertaVencimento = { id: string; nome: string; documento: string; dias: number; data: Date };
+  const vencimentosProximos: AlertaVencimento[] = [];
+  for (const c of comDocumentoParaChecar) {
+    const diasPassaporte = diasParaData(c.validadePassaporte);
+    if (precisaAlertarVencimento(diasPassaporte)) {
+      vencimentosProximos.push({
+        id: c.id,
+        nome: c.nome,
+        documento: "Passaporte",
+        dias: diasPassaporte!,
+        data: c.validadePassaporte as Date,
+      });
+    }
+    const diasVisto = diasParaData(c.dataVencimentoVistoAtual);
+    if (precisaAlertarVencimento(diasVisto)) {
+      vencimentosProximos.push({
+        id: c.id,
+        nome: c.nome,
+        documento: "Visto atual",
+        dias: diasVisto!,
+        data: c.dataVencimentoVistoAtual as Date,
+      });
+    }
+  }
+  vencimentosProximos.sort((a, b) => a.dias - b.dias);
 
   return (
     <div className="flex flex-col gap-6">
@@ -102,6 +135,32 @@ export default async function PainelPage() {
                   <span className="text-blue-700">
                     {" "}
                     — entrevista em {dias} dias ({formatarDataBr(c.dataEntrevista)})
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {vencimentosProximos.length > 0 && (
+        <div className="rounded-md border border-orange-200 bg-orange-50 p-4">
+          <p className="text-sm font-medium text-orange-800">
+            🛂 {vencimentosProximos.length} documento
+            {vencimentosProximos.length === 1 ? "" : "s"} vencendo (passaporte/visto)
+          </p>
+          <ul className="mt-2 flex flex-col gap-1">
+            {vencimentosProximos.map((v, i) => {
+              const situacao =
+                v.dias < 0 ? `vencido há ${Math.abs(v.dias)} dias` : `vence em ${v.dias} dias`;
+              return (
+                <li key={`${v.id}-${i}`} className="text-sm">
+                  <Link href={`/clientes/${v.id}`} className="text-orange-800 hover:underline">
+                    {v.nome}
+                  </Link>
+                  <span className="text-orange-700">
+                    {" "}
+                    — {v.documento} {situacao} ({formatarDataBr(v.data)})
                   </span>
                 </li>
               );

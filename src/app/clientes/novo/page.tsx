@@ -26,6 +26,11 @@ export default function NovoClientePage() {
           <div className="grid grid-cols-2 gap-4">
             <Campo label="Número do passaporte" name="numeroPassaporte" />
             <Campo label="Validade" name="validadePassaporte" type="date" />
+            <Campo
+              label="Vencimento do visto atual (se for renovação)"
+              name="dataVencimentoVistoAtual"
+              type="date"
+            />
           </div>
         </section>
 

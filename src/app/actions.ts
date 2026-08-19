@@ -40,6 +40,7 @@ export async function criarCliente(formData: FormData) {
       endereco: stringOrNull(formData.get("endereco")),
       numeroPassaporte: stringOrNull(formData.get("numeroPassaporte")),
       validadePassaporte: dateOrNull(formData.get("validadePassaporte")),
+      dataVencimentoVistoAtual: dateOrNull(formData.get("dataVencimentoVistoAtual")),
       observacoes: stringOrNull(formData.get("observacoes")),
       historico: {
         create: { etapa: "CADASTRO" },
@@ -76,6 +77,7 @@ export async function atualizarDadosCliente(clienteId: string, formData: FormDat
       endereco: stringOrNull(formData.get("endereco")),
       numeroPassaporte: stringOrNull(formData.get("numeroPassaporte")),
       validadePassaporte: dateOrNull(formData.get("validadePassaporte")),
+      dataVencimentoVistoAtual: dateOrNull(formData.get("dataVencimentoVistoAtual")),
     },
   });
 

@@ -72,18 +72,22 @@ export function estaAtrasado(etapa: EtapaProcesso, dias: number | null): boolean
   return limite != null && dias != null && dias > limite;
 }
 
-// Quantos dias faltam pra data da entrevista (negativo se já passou).
-// dataEntrevista é uma "data pura" salva como meia-noite UTC (ver
-// src/lib/formatar.ts) — por isso lê o dia em UTC em vez de horário
-// local, senão a conta erra por causa do fuso (Brasil é UTC-3).
-export function diasParaEntrevista(dataEntrevista: Date | null): number | null {
-  if (!dataEntrevista) return null;
+// Quantos dias faltam pra uma "data pura" (negativo se já passou). Datas
+// puras (entrevista, validade de passaporte, vencimento de visto) são
+// salvas como meia-noite UTC (ver src/lib/formatar.ts) — por isso lê o
+// dia em UTC em vez de horário local, senão a conta erra por causa do
+// fuso (Brasil é UTC-3).
+export function diasParaData(data: Date | null): number | null {
+  if (!data) return null;
   const hoje = new Date();
   const hojeUTC = Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-  const dia = new Date(dataEntrevista);
+  const dia = new Date(data);
   const diaUTC = Date.UTC(dia.getUTCFullYear(), dia.getUTCMonth(), dia.getUTCDate());
   return Math.round((diaUTC - hojeUTC) / (1000 * 60 * 60 * 24));
 }
+
+// Mantido como apelido pra deixar claro o uso em cada tela.
+export const diasParaEntrevista = diasParaData;
 
 export const DIAS_LEMBRETE_ENTREVISTA = 2;
 
@@ -121,4 +125,13 @@ export function precisaLembrarInstrucoes(
     diasParaEntrevista >= 0 &&
     diasParaEntrevista <= DIAS_LEMBRETE_INSTRUCOES
   );
+}
+
+// Passaporte com menos de 6 meses de validade é motivo de recusa de
+// entrada nos EUA — por isso o alerta antecede bastante o vencimento
+// de verdade. Mesmo prazo pro visto atual (em caso de renovação).
+export const DIAS_ALERTA_VENCIMENTO = 180;
+
+export function precisaAlertarVencimento(diasParaVencer: number | null): boolean {
+  return diasParaVencer != null && diasParaVencer <= DIAS_ALERTA_VENCIMENTO;
 }

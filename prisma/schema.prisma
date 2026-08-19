@@ -36,6 +36,7 @@ model Cliente {
 
   numeroPassaporte    String?
   validadePassaporte  DateTime?
+  dataVencimentoVistoAtual DateTime?
 
   etapaAtual   EtapaProcesso @default(CADASTRO)
   dataEntrevista DateTime?

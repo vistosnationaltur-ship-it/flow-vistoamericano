@@ -251,6 +251,14 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
             value={cliente.validadePassaporte ? formatarDataBr(cliente.validadePassaporte) : null}
           />
           <Info
+            label="Vencimento do visto atual"
+            value={
+              cliente.dataVencimentoVistoAtual
+                ? formatarDataBr(cliente.dataVencimentoVistoAtual)
+                : null
+            }
+          />
+          <Info
             label="Cadastrado em"
             value={new Date(cliente.criadoEm).toLocaleDateString("pt-BR")}
           />
