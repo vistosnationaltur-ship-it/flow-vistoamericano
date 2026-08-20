@@ -133,23 +133,28 @@ export async function enviarContrato(clienteId: string) {
 // Cadastra o cliente no módulo separado Rascunho DS160 (repo/banco
 // próprios) e já dispara o link de acesso por WhatsApp — tudo num
 // clique só daqui do Flow, sem precisar abrir o outro sistema.
-export async function gerarAcessoDs160(clienteId: string) {
+export type EstadoGerarAcessoDs160 = { erro?: string };
+
+export async function gerarAcessoDs160(
+  clienteId: string,
+  _estadoAnterior: EstadoGerarAcessoDs160,
+): Promise<EstadoGerarAcessoDs160> {
   const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
 
   if (!cliente.email) {
-    throw new Error("Cliente não tem e-mail cadastrado — é o login dele no Rascunho DS160.");
+    return { erro: "Cliente não tem e-mail cadastrado — é o login dele no Rascunho DS160." };
   }
   if (!cliente.telefone) {
-    throw new Error("Cliente não tem telefone cadastrado — precisa pra mandar o link por WhatsApp.");
+    return { erro: "Cliente não tem telefone cadastrado — precisa pra mandar o link por WhatsApp." };
   }
   if (!cliente.cpf) {
-    throw new Error("Cliente não tem CPF cadastrado — é a senha de login dele no Rascunho DS160.");
+    return { erro: "Cliente não tem CPF cadastrado — é a senha de login dele no Rascunho DS160." };
   }
 
   const baseUrl = process.env.DS160_RASCUNHO_API_URL;
   const secret = process.env.DS160_RASCUNHO_API_SECRET;
   if (!baseUrl || !secret) {
-    throw new Error("DS160_RASCUNHO_API_URL ou DS160_RASCUNHO_API_SECRET não configuradas.");
+    return { erro: "DS160_RASCUNHO_API_URL ou DS160_RASCUNHO_API_SECRET não configuradas." };
   }
 
   const resposta = await fetch(new URL("/api/flow-integracao/cadastrar-cliente", baseUrl), {
@@ -166,7 +171,7 @@ export async function gerarAcessoDs160(clienteId: string) {
 
   const dados = await resposta.json();
   if (!resposta.ok) {
-    throw new Error(dados.erro ?? `Falha ao gerar acesso no Rascunho DS160 (HTTP ${resposta.status}).`);
+    return { erro: dados.erro ?? `Falha ao gerar acesso no Rascunho DS160 (HTTP ${resposta.status}).` };
   }
 
   await prisma.cliente.update({
@@ -187,6 +192,7 @@ export async function gerarAcessoDs160(clienteId: string) {
 
   revalidatePath(`/clientes/${clienteId}`);
   revalidatePath("/clientes");
+  return {};
 }
 
 export async function avancarEtapa(clienteId: string, formData: FormData) {

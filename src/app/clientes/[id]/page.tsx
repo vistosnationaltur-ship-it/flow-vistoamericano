@@ -19,11 +19,11 @@ import {
   enviarDocumento,
   removerDocumento,
   enviarContrato,
-  gerarAcessoDs160,
   excluirCliente,
   excluirDocumentosCliente,
 } from "@/app/actions";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
+import { GerarAcessoDs160Form } from "@/components/GerarAcessoDs160Form";
 import { sessaoAtual } from "@/lib/auth";
 import { CampoData } from "@/components/CampoData";
 import { CampoMoeda } from "@/components/CampoMoeda";
@@ -87,7 +87,6 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   const entrarNoGrupoComId = entrarNoGrupo.bind(null, cliente.id);
   const sairDoGrupoComId = sairDoGrupo.bind(null, cliente.id);
   const enviarContratoComId = enviarContrato.bind(null, cliente.id);
-  const gerarAcessoDs160ComId = gerarAcessoDs160.bind(null, cliente.id);
   const excluirComId = excluirCliente.bind(null, cliente.id);
   const excluirDocumentosComId = excluirDocumentosCliente.bind(null, cliente.id);
 
@@ -197,18 +196,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
             )}
 
             {cliente.etapaAtual === "CONTRATO_ENVIADO" && (
-              <form action={gerarAcessoDs160ComId}>
-                <ConfirmSubmitButton
-                  confirmMessage={
-                    cliente.cpf
-                      ? "Gerar acesso ao Rascunho DS160 e enviar o link por WhatsApp? A senha de login do cliente vai ser o CPF dele."
-                      : "Esse cliente não tem CPF cadastrado — o CPF é a senha de login do Rascunho DS160. Cadastre o CPF antes de gerar o acesso."
-                  }
-                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-500"
-                >
-                  Gerar acesso Rascunho DS160
-                </ConfirmSubmitButton>
-              </form>
+              <GerarAcessoDs160Form clienteId={cliente.id} temCpf={Boolean(cliente.cpf)} />
             )}
 
             {proxima && (
