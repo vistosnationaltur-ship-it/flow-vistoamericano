@@ -130,6 +130,66 @@ export async function enviarContrato(clienteId: string) {
   revalidatePath("/clientes");
 }
 
+// Cadastra o cliente no módulo separado Rascunho DS160 (repo/banco
+// próprios) e já dispara o link de acesso por WhatsApp — tudo num
+// clique só daqui do Flow, sem precisar abrir o outro sistema.
+export async function gerarAcessoDs160(clienteId: string, formData: FormData) {
+  const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
+
+  if (!cliente.email) {
+    throw new Error("Cliente não tem e-mail cadastrado — é o login dele no Rascunho DS160.");
+  }
+  if (!cliente.telefone) {
+    throw new Error("Cliente não tem telefone cadastrado — precisa pra mandar o link por WhatsApp.");
+  }
+
+  const senha = (formData.get("senha") ?? "").toString();
+  if (!senha) throw new Error("Informe uma senha de acesso.");
+
+  const baseUrl = process.env.DS160_RASCUNHO_API_URL;
+  const secret = process.env.DS160_RASCUNHO_API_SECRET;
+  if (!baseUrl || !secret) {
+    throw new Error("DS160_RASCUNHO_API_URL ou DS160_RASCUNHO_API_SECRET não configuradas.");
+  }
+
+  const resposta = await fetch(new URL("/api/flow-integracao/cadastrar-cliente", baseUrl), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${secret}` },
+    body: JSON.stringify({
+      nome: cliente.nome,
+      cpf: cliente.cpf,
+      email: cliente.email,
+      telefone: cliente.telefone,
+      senha,
+      flowClienteId: cliente.id,
+    }),
+  });
+
+  const dados = await resposta.json();
+  if (!resposta.ok) {
+    throw new Error(dados.erro ?? `Falha ao gerar acesso no Rascunho DS160 (HTTP ${resposta.status}).`);
+  }
+
+  await prisma.cliente.update({
+    where: { id: clienteId },
+    data: {
+      etapaAtual: cliente.etapaAtual === "CONTRATO_ENVIADO" ? "RASCUNHO_DS160_SOLICITADO" : cliente.etapaAtual,
+      historico: {
+        create: {
+          etapa:
+            cliente.etapaAtual === "CONTRATO_ENVIADO" ? "RASCUNHO_DS160_SOLICITADO" : cliente.etapaAtual,
+          observacao: dados.whatsappEnviado
+            ? "Acesso ao Rascunho DS160 gerado e link enviado por WhatsApp"
+            : `Acesso ao Rascunho DS160 gerado, mas envio por WhatsApp falhou: ${dados.whatsappErro ?? "motivo desconhecido"}`,
+        },
+      },
+    },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+  revalidatePath("/clientes");
+}
+
 export async function avancarEtapa(clienteId: string, formData: FormData) {
   const cliente = await prisma.cliente.findUniqueOrThrow({
     where: { id: clienteId },

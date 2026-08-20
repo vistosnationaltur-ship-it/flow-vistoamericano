@@ -19,6 +19,7 @@ import {
   enviarDocumento,
   removerDocumento,
   enviarContrato,
+  gerarAcessoDs160,
   excluirCliente,
   excluirDocumentosCliente,
 } from "@/app/actions";
@@ -86,6 +87,7 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
   const entrarNoGrupoComId = entrarNoGrupo.bind(null, cliente.id);
   const sairDoGrupoComId = sairDoGrupo.bind(null, cliente.id);
   const enviarContratoComId = enviarContrato.bind(null, cliente.id);
+  const gerarAcessoDs160ComId = gerarAcessoDs160.bind(null, cliente.id);
   const excluirComId = excluirCliente.bind(null, cliente.id);
   const excluirDocumentosComId = excluirDocumentosCliente.bind(null, cliente.id);
 
@@ -190,6 +192,24 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
                   className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-500"
                 >
                   Enviar contrato (Authentique)
+                </button>
+              </form>
+            )}
+
+            {cliente.etapaAtual === "CONTRATO_ENVIADO" && (
+              <form action={gerarAcessoDs160ComId} className="flex gap-2">
+                <input
+                  type="password"
+                  name="senha"
+                  required
+                  placeholder="Senha de acesso pro cliente"
+                  className={`${INPUT} text-sm`}
+                />
+                <button
+                  type="submit"
+                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-500"
+                >
+                  Gerar acesso Rascunho DS160
                 </button>
               </form>
             )}
