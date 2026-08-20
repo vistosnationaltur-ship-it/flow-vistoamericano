@@ -197,20 +197,17 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
             )}
 
             {cliente.etapaAtual === "CONTRATO_ENVIADO" && (
-              <form action={gerarAcessoDs160ComId} className="flex gap-2">
-                <input
-                  type="password"
-                  name="senha"
-                  required
-                  placeholder="Senha de acesso pro cliente"
-                  className={`${INPUT} text-sm`}
-                />
-                <button
-                  type="submit"
+              <form action={gerarAcessoDs160ComId}>
+                <ConfirmSubmitButton
+                  confirmMessage={
+                    cliente.cpf
+                      ? "Gerar acesso ao Rascunho DS160 e enviar o link por WhatsApp? A senha de login do cliente vai ser o CPF dele."
+                      : "Esse cliente não tem CPF cadastrado — o CPF é a senha de login do Rascunho DS160. Cadastre o CPF antes de gerar o acesso."
+                  }
                   className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-500"
                 >
                   Gerar acesso Rascunho DS160
-                </button>
+                </ConfirmSubmitButton>
               </form>
             )}
 

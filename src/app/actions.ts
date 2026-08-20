@@ -133,7 +133,7 @@ export async function enviarContrato(clienteId: string) {
 // Cadastra o cliente no módulo separado Rascunho DS160 (repo/banco
 // próprios) e já dispara o link de acesso por WhatsApp — tudo num
 // clique só daqui do Flow, sem precisar abrir o outro sistema.
-export async function gerarAcessoDs160(clienteId: string, formData: FormData) {
+export async function gerarAcessoDs160(clienteId: string) {
   const cliente = await prisma.cliente.findUniqueOrThrow({ where: { id: clienteId } });
 
   if (!cliente.email) {
@@ -142,9 +142,9 @@ export async function gerarAcessoDs160(clienteId: string, formData: FormData) {
   if (!cliente.telefone) {
     throw new Error("Cliente não tem telefone cadastrado — precisa pra mandar o link por WhatsApp.");
   }
-
-  const senha = (formData.get("senha") ?? "").toString();
-  if (!senha) throw new Error("Informe uma senha de acesso.");
+  if (!cliente.cpf) {
+    throw new Error("Cliente não tem CPF cadastrado — é a senha de login dele no Rascunho DS160.");
+  }
 
   const baseUrl = process.env.DS160_RASCUNHO_API_URL;
   const secret = process.env.DS160_RASCUNHO_API_SECRET;
@@ -160,7 +160,6 @@ export async function gerarAcessoDs160(clienteId: string, formData: FormData) {
       cpf: cliente.cpf,
       email: cliente.email,
       telefone: cliente.telefone,
-      senha,
       flowClienteId: cliente.id,
     }),
   });
