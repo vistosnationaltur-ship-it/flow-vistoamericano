@@ -72,6 +72,12 @@ model Cliente {
   etapaAtual   EtapaProcesso @default(CADASTRO)
   dataEntrevista DateTime?
   contratoEnviadoEm DateTime?
+  // Preenchido automaticamente quando o cliente clica "Concluído" no
+  // rascunho web (ds160-rascunho) — diferente de etapaAtual, que só
+  // avança quando o robô/staff faz isso manualmente depois. Serve pra
+  // sinalizar "já dá pra rodar o robô" sem precisar checar o admin do
+  // ds160-rascunho.
+  rascunhoDs160ConcluidoEm DateTime?
 
   valorTaxaMrv    Float?
   dataPagamentoMrv DateTime?

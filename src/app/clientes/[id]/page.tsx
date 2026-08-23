@@ -182,6 +182,13 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
           </p>
         )}
 
+        {cliente.rascunhoDs160ConcluidoEm && (
+          <p className="mt-2 rounded-lg bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-300">
+            ✓ Cliente concluiu o rascunho do DS-160 em {formatarDataBr(cliente.rascunhoDs160ConcluidoEm)} —
+            já dá pra rodar o robô.
+          </p>
+        )}
+
         {!finalizado && (
           <div className="mt-6 flex flex-wrap gap-3 border-t border-white/5 pt-5">
             {cliente.etapaAtual === "CADASTRO" && (
