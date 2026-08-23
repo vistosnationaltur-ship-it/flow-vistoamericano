@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "EtapaProcesso" ADD VALUE 'DS160_AGUARDANDO_REVISAO';

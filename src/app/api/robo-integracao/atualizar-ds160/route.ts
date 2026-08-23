@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ORDEM_ETAPAS } from "@/lib/etapas";
 
 // Endpoint isolado pro robô de automação DS-160 (repo `automacao-ds160`)
 // gravar o Application ID direto na ficha do cliente, assim que o
@@ -32,9 +33,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erro: "Cliente não encontrado." }, { status: 404 });
   }
 
+  // Avança pra "aguardando revisão" — mas só pra frente. O robô e o
+  // consultor que revisa depois costumam ser pessoas diferentes, então o
+  // preenchimento automático não pode pular direto pra "DS-160
+  // preenchido" (isso fica pra quando o consultor confirmar manualmente).
+  // Se o cliente já estiver mais adiante no pipeline por algum motivo,
+  // não mexe na etapa — só grava o número mesmo.
+  const indiceAtual = ORDEM_ETAPAS.indexOf(cliente.etapaAtual);
+  const indiceRevisao = ORDEM_ETAPAS.indexOf("DS160_AGUARDANDO_REVISAO");
+  const dados: { numeroDs160: string; etapaAtual?: "DS160_AGUARDANDO_REVISAO" } = { numeroDs160 };
+  if (indiceAtual !== -1 && indiceAtual < indiceRevisao) {
+    dados.etapaAtual = "DS160_AGUARDANDO_REVISAO";
+  }
+
   await prisma.cliente.update({
     where: { id: clienteId },
-    data: { numeroDs160 },
+    data: dados,
   });
 
   return NextResponse.json({ ok: true });
