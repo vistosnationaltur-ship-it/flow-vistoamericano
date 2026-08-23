@@ -189,6 +189,13 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
           </p>
         )}
 
+        <Link
+          href={`/clientes/${cliente.id}/ds160-rascunho`}
+          className="mt-2 inline-block text-xs text-indigo-300 underline-offset-2 hover:underline"
+        >
+          Ver rascunho do DS-160 preenchido →
+        </Link>
+
         {!finalizado && (
           <div className="mt-6 flex flex-wrap gap-3 border-t border-white/5 pt-5">
             {cliente.etapaAtual === "CADASTRO" && (
