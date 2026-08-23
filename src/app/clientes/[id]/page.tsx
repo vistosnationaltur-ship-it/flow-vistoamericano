@@ -152,6 +152,14 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
                     {concluida ? "✓" : ""}
                   </span>
                   {ETAPA_LABEL[etapa]}
+                  {etapa === "RASCUNHO_DS160_SOLICITADO" && concluida && (
+                    <Link
+                      href={`/clientes/${cliente.id}/ds160-rascunho`}
+                      className="text-xs font-normal text-indigo-300 underline-offset-2 hover:underline"
+                    >
+                      ver rascunho →
+                    </Link>
+                  )}
                 </span>
                 {data && (
                   <span className="text-xs text-zinc-500">
@@ -188,13 +196,6 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
             já dá pra rodar o robô.
           </p>
         )}
-
-        <Link
-          href={`/clientes/${cliente.id}/ds160-rascunho`}
-          className="mt-2 inline-block text-xs text-indigo-300 underline-offset-2 hover:underline"
-        >
-          Ver rascunho do DS-160 preenchido →
-        </Link>
 
         {!finalizado && (
           <div className="mt-6 flex flex-wrap gap-3 border-t border-white/5 pt-5">
