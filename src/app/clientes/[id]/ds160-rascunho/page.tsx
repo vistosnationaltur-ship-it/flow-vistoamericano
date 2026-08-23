@@ -16,6 +16,7 @@ type RespostaDs160Rascunho = {
   nome: string;
   cpf: string | null;
   status: string;
+  ordem: string[];
   respostas: Record<string, RespostaResolvida>;
 };
 
@@ -59,7 +60,14 @@ export default async function Ds160RascunhoPage({ params }: { params: Promise<{ 
     }
   }
 
-  const itens = dados ? Object.entries(dados.respostas) : [];
+  // Usa `ordem` (sequência real das páginas do formulário) em vez de
+  // Object.entries: chaves numéricas puras reordenam sozinhas em ordem
+  // crescente de valor, o que embaralhava a exibição (ex.: pergunta de
+  // segurança, id baixo, aparecendo antes de pergunta de página anterior
+  // com id mais alto).
+  const itens: [string, RespostaResolvida][] = dados
+    ? dados.ordem.map((campoId) => [campoId, dados.respostas[campoId]])
+    : [];
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
