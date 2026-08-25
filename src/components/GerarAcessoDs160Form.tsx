@@ -22,6 +22,7 @@ export function GerarAcessoDs160Form({ clienteId, temCpf }: { clienteId: string;
         {pendente ? "Gerando..." : "Gerar acesso Rascunho DS160"}
       </ConfirmSubmitButton>
       {estado?.erro && <p className="text-sm text-red-400">{estado.erro}</p>}
+      {estado?.aviso && <p className="text-sm text-amber-400">{estado.aviso}</p>}
     </form>
   );
 }

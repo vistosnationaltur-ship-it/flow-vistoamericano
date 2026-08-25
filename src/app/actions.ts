@@ -133,7 +133,7 @@ export async function enviarContrato(clienteId: string) {
 // Cadastra o cliente no módulo separado Rascunho DS160 (repo/banco
 // próprios) e já dispara o link de acesso por WhatsApp — tudo num
 // clique só daqui do Flow, sem precisar abrir o outro sistema.
-export type EstadoGerarAcessoDs160 = { erro?: string };
+export type EstadoGerarAcessoDs160 = { erro?: string; aviso?: string };
 
 export async function gerarAcessoDs160(
   clienteId: string,
@@ -171,6 +171,11 @@ export async function gerarAcessoDs160(
 
   const dados = await resposta.json();
   if (!resposta.ok) {
+    // Cliente já cadastrado (CPF repetido) não é uma falha de verdade —
+    // é só informativo, pra equipe não achar que algo quebrou.
+    if (resposta.status === 409) {
+      return { aviso: dados.erro ?? "Esse cliente já tem cadastro no Rascunho DS160." };
+    }
     return { erro: dados.erro ?? `Falha ao gerar acesso no Rascunho DS160 (HTTP ${resposta.status}).` };
   }
 
