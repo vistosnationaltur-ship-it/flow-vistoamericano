@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Flow Visto Americano",
+  title: "Flow 2N Assessoria",
   description: "Acompanhamento do processo de assessoria de visto americano de turista",
 };
 
@@ -37,7 +37,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               className="flex items-center gap-2 font-semibold tracking-tight text-zinc-100"
             >
               <span className="inline-block h-2 w-2 rounded-full bg-indigo-500" />
-              Flow Visto Americano
+              Flow 2N Assessoria
             </Link>
             {sessao && (
               <nav className="flex items-center gap-1 text-sm text-zinc-400">

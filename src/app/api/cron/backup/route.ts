@@ -31,9 +31,9 @@ export async function GET(request: Request) {
 
   const resend = new Resend(resendApiKey);
   const { error } = await resend.emails.send({
-    from: "Flow Visto Americano <onboarding@resend.dev>",
+    from: "Flow 2N Assessoria <onboarding@resend.dev>",
     to: destinatario,
-    subject: `Backup diário — Flow Visto Americano (${geradoEm.slice(0, 10)})`,
+    subject: `Backup diário — Flow 2N Assessoria (${geradoEm.slice(0, 10)})`,
     text: `Backup automático gerado em ${geradoEm}.\n\n${clientes.length} clientes, ${grupos.length} famílias, ${historico.length} registros de histórico, ${documentos.length} documentos, ${contratos.length} contratos, ${usuarios.length} usuários.`,
     attachments: [
       {
