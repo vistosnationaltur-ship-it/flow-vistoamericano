@@ -5,10 +5,17 @@ import { criarUsuario, excluirUsuario } from "@/app/actions";
 import { formatarDataBr } from "@/lib/formatar";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 
+const CARD = "rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-base)] p-6";
+const CARD_TITLE = "mb-1 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]";
+const SECTION_TITLE = "mb-4 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]";
 const INPUT =
-  "rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30";
+  "rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-base-deep)] px-3 py-2 text-[var(--color-text)] outline-none transition-colors duration-150 ease-out focus:border-[var(--color-accent-focus)] focus:ring-2 focus:ring-[var(--color-accent-ring)]";
 const LABEL = "flex flex-col gap-1.5 text-sm";
-const LABEL_TEXT = "text-zinc-400";
+const LABEL_TEXT = "text-[var(--color-text-subtle)]";
+const BTN_PRIMARY =
+  "rounded-lg border border-[var(--color-accent)] bg-[var(--color-accent-surface)] px-4 py-2 text-sm font-semibold text-[var(--color-accent)] shadow-[var(--shadow-accent-rest)] transition-shadow duration-150 ease-out hover:shadow-[var(--shadow-accent-hover)] motion-safe:hover:-translate-y-px motion-safe:transition-[transform,box-shadow] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]";
+const BTN_OUTLINE =
+  "inline-flex rounded-lg border border-[var(--color-border-subtle)] px-4 py-2 text-sm font-medium text-[var(--color-text-subtle)] transition-colors duration-150 ease-out hover:bg-white/5 hover:text-[var(--color-text)]";
 
 export default async function UsuariosPage() {
   const sessao = await sessaoAtual();
@@ -18,24 +25,23 @@ export default async function UsuariosPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Usuários</h1>
+      <h1 className="text-[length:var(--text-display)] leading-[var(--leading-display)] font-semibold tracking-[var(--tracking-display)] text-[var(--color-text)]">
+        Usuários
+      </h1>
 
-      <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
-        <h2 className="mb-1 text-sm font-semibold text-zinc-500">Backup</h2>
-        <p className="mb-4 text-sm text-zinc-500">
+      <section className={CARD}>
+        <h2 className={CARD_TITLE}>Backup</h2>
+        <p className="mb-4 text-sm text-[var(--color-text-muted)]">
           Baixa uma cópia de tudo (clientes, famílias, histórico, documentos, contratos e
           usuários) num arquivo JSON — guarde num lugar seguro fora da Vercel de vez em quando.
         </p>
-        <a
-          href="/admin/backup"
-          className="inline-flex rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/5"
-        >
+        <a href="/admin/backup" className={BTN_OUTLINE}>
           Baixar backup
         </a>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
-        <h2 className="mb-4 text-sm font-semibold text-zinc-500">Cadastrar novo usuário</h2>
+      <section className={CARD}>
+        <h2 className={SECTION_TITLE}>Cadastrar novo usuário</h2>
         <form action={criarUsuario} className="flex flex-wrap items-end gap-3">
           <label className={LABEL}>
             <span className={LABEL_TEXT}>Usuário</span>
@@ -50,13 +56,7 @@ export default async function UsuariosPage() {
           </label>
           <label className={LABEL}>
             <span className={LABEL_TEXT}>Senha</span>
-            <input
-              type="password"
-              name="senha"
-              required
-              minLength={6}
-              className={`w-48 ${INPUT}`}
-            />
+            <input type="password" name="senha" required minLength={6} className={`w-48 ${INPUT}`} />
           </label>
           <label className={LABEL}>
             <span className={LABEL_TEXT}>Permissão</span>
@@ -65,39 +65,36 @@ export default async function UsuariosPage() {
               <option value="ADMIN">Administrador</option>
             </select>
           </label>
-          <button
-            type="submit"
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
-          >
+          <button type="submit" className={BTN_PRIMARY}>
             Cadastrar
           </button>
         </form>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
-        <h2 className="mb-4 text-sm font-semibold text-zinc-500">Usuários cadastrados</h2>
-        <ul className="flex flex-col divide-y divide-white/5">
+      <section className={CARD}>
+        <h2 className={SECTION_TITLE}>Usuários cadastrados</h2>
+        <ul className="flex flex-col divide-y divide-[var(--color-border-subtle)]">
           {usuarios.map((u) => (
             <li key={u.id} className="flex items-center justify-between py-2.5 text-sm">
-              <span className="text-zinc-200">{u.username}</span>
+              <span className="text-[var(--color-text)]">{u.username}</span>
               <div className="flex items-center gap-3">
                 <span
-                  className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                  className={`rounded-full border px-2.5 py-1 text-xs font-medium ${
                     u.role === "ADMIN"
-                      ? "bg-indigo-500/15 text-indigo-300"
-                      : "bg-zinc-500/15 text-zinc-300"
+                      ? "border-[var(--color-accent-border)] bg-[var(--color-accent-surface)] text-[var(--color-accent)]"
+                      : "border-[var(--color-border-subtle)] text-[var(--color-text-subtle)]"
                   }`}
                 >
                   {u.role === "ADMIN" ? "Administrador" : "Usuário"}
                 </span>
-                <span className="text-xs text-zinc-500">
+                <span className="text-xs text-[var(--color-text-muted)]">
                   desde {formatarDataBr(u.criadoEm)}
                 </span>
                 {u.id !== sessao.id && (
                   <form action={excluirUsuario.bind(null, u.id)}>
                     <ConfirmSubmitButton
                       confirmMessage={`Excluir o usuário "${u.username}"? Ele perde o acesso ao sistema imediatamente.`}
-                      className="text-xs font-medium text-red-400 hover:text-red-300 hover:underline"
+                      className="text-xs font-medium text-[var(--color-danger)] transition-colors duration-150 ease-out hover:underline"
                     >
                       Excluir
                     </ConfirmSubmitButton>

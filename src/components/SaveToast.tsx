@@ -45,8 +45,8 @@ export function SaveToast() {
         visivel ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
       }`}
     >
-      <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/90 px-3 py-2 text-xs text-zinc-300 shadow-lg backdrop-blur-md">
-        <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+      <div className="flex items-center gap-2 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-base)]/95 px-3 py-2 text-xs text-[var(--color-text-subtle)] shadow-[var(--shadow-card)] backdrop-blur-md">
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-success)]" />
         Salvo com sucesso
       </div>
     </div>

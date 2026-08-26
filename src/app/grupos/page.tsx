@@ -10,15 +10,17 @@ export default async function GruposPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Famílias</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className="text-[length:var(--text-display)] leading-[var(--leading-display)] font-semibold tracking-[var(--tracking-display)] text-[var(--color-text)]">
+          Famílias
+        </h1>
+        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
           {grupos.length} família{grupos.length === 1 ? "" : "s"} cadastrada
           {grupos.length === 1 ? "" : "s"}
         </p>
       </div>
 
       {grupos.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-white/10 bg-zinc-900/40 p-10 text-center text-sm text-zinc-500">
+        <p className="rounded-2xl border border-dashed border-[var(--color-border-subtle)] bg-[var(--color-base)]/60 p-10 text-center text-sm text-[var(--color-text-muted)]">
           Nenhuma família criada ainda. Pra criar uma, vá na página de um cliente e use a seção
           &quot;Grupo familiar&quot;.
         </p>
@@ -28,15 +30,15 @@ export default async function GruposPage() {
             <Link
               key={g.id}
               href={`/grupos/${g.id}`}
-              className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-zinc-900/60 p-5 transition-colors hover:border-indigo-500/40 hover:bg-zinc-900"
+              className="flex flex-col gap-2 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-base)] p-5 transition-colors duration-150 ease-out hover:border-[var(--color-accent-border)]"
             >
-              <span className="font-medium text-zinc-100">Família {g.nome}</span>
-              <span className="text-sm text-zinc-500">
+              <span className="font-medium text-[var(--color-text)]">Família {g.nome}</span>
+              <span className="text-sm text-[var(--color-text-muted)]">
                 {g.clientes.length} pessoa{g.clientes.length === 1 ? "" : "s"}
                 {g.valorServico != null &&
                   ` · R$ ${g.valorServico.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`}
               </span>
-              <span className="text-xs text-zinc-500">
+              <span className="text-xs text-[var(--color-text-muted)]">
                 {g.clientes.map((c) => c.nome).join(", ")}
               </span>
             </Link>

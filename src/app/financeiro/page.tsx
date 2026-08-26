@@ -10,6 +10,9 @@ type Transacao = {
   data: Date | null;
 };
 
+const CARD = "rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-base)] p-5";
+const CARD_TITLE = "mb-4 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]";
+
 export default async function FinanceiroPage() {
   const [clientesSolo, grupos] = await Promise.all([
     prisma.cliente.findMany({
@@ -69,36 +72,38 @@ export default async function FinanceiroPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Financeiro</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className="text-[length:var(--text-display)] leading-[var(--leading-display)] font-semibold tracking-[var(--tracking-display)] text-[var(--color-text)]">
+          Financeiro
+        </h1>
+        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
           Valor do serviço de assessoria (não inclui taxa MRV)
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-5">
-          <span className="text-2xl font-semibold tabular-nums text-zinc-100">
+        <div className={CARD}>
+          <span className="text-2xl font-semibold tabular-nums text-[var(--color-text)]">
             {formatarReais(totalMes)}
           </span>
-          <p className="mt-1 text-sm text-zinc-500">Faturado este mês</p>
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">Faturado este mês</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-5">
-          <span className="text-2xl font-semibold tabular-nums text-zinc-100">
+        <div className={CARD}>
+          <span className="text-2xl font-semibold tabular-nums text-[var(--color-text)]">
             {formatarReais(totalAno)}
           </span>
-          <p className="mt-1 text-sm text-zinc-500">Faturado este ano</p>
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">Faturado este ano</p>
         </div>
-        <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/[0.06] p-5">
-          <span className="text-2xl font-semibold tabular-nums text-indigo-200">
+        <div className="rounded-2xl border border-[var(--color-accent-border)] bg-[var(--color-accent-surface)]/40 p-5">
+          <span className="text-2xl font-semibold tabular-nums text-[var(--color-accent)]">
             {formatarReais(totalGeral)}
           </span>
-          <p className="mt-1 text-sm text-zinc-500">Faturado no total</p>
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">Faturado no total</p>
         </div>
       </div>
 
       {mesesOrdenados.length > 0 && (
-        <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
-          <h2 className="mb-4 text-sm font-semibold text-zinc-500">Por mês</h2>
+        <section className={CARD}>
+          <h2 className={CARD_TITLE}>Por mês</h2>
           <table className="w-full text-sm">
             <tbody>
               {mesesOrdenados.map(([chave, valor]) => {
@@ -109,9 +114,9 @@ export default async function FinanceiroPage() {
                 );
                 const nomeMes = nomeMesBruto.charAt(0).toUpperCase() + nomeMesBruto.slice(1);
                 return (
-                  <tr key={chave} className="border-t border-white/5">
-                    <td className="py-2.5 text-zinc-400">{nomeMes}</td>
-                    <td className="py-2.5 text-right font-medium text-zinc-100">
+                  <tr key={chave} className="border-t border-[var(--color-border-subtle)]">
+                    <td className="py-2.5 text-[var(--color-text-muted)]">{nomeMes}</td>
+                    <td className="py-2.5 text-right font-medium text-[var(--color-text)]">
                       {formatarReais(valor)}
                     </td>
                   </tr>
@@ -122,17 +127,17 @@ export default async function FinanceiroPage() {
         </section>
       )}
 
-      <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
-        <h2 className="mb-4 text-sm font-semibold text-zinc-500">Transações</h2>
+      <section className={CARD}>
+        <h2 className={CARD_TITLE}>Transações</h2>
         {transacoes.length === 0 ? (
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-[var(--color-text-muted)]">
             Nenhum pagamento de serviço registrado ainda.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-zinc-500">
-                <tr className="border-b border-white/10">
+              <thead className="text-left text-[var(--color-text-muted)]">
+                <tr className="border-b border-[var(--color-border-subtle)]">
                   <th className="pb-2 font-medium">Cliente / família</th>
                   <th className="pb-2 font-medium">Pago em</th>
                   <th className="pb-2 text-right font-medium">Valor</th>
@@ -140,19 +145,19 @@ export default async function FinanceiroPage() {
               </thead>
               <tbody>
                 {transacoes.map((t) => (
-                  <tr key={t.id} className="border-t border-white/5">
+                  <tr key={t.id} className="border-t border-[var(--color-border-subtle)]">
                     <td className="py-2.5">
                       <Link
                         href={t.href}
-                        className="text-zinc-100 hover:text-indigo-300 hover:underline"
+                        className="text-[var(--color-text)] hover:text-[var(--color-accent)] hover:underline"
                       >
                         {t.label}
                       </Link>
                     </td>
-                    <td className="py-2.5 text-zinc-500">
+                    <td className="py-2.5 text-[var(--color-text-muted)]">
                       {t.data ? formatarDataBr(t.data) : "sem data"}
                     </td>
-                    <td className="py-2.5 text-right font-medium text-zinc-100">
+                    <td className="py-2.5 text-right font-medium text-[var(--color-text)]">
                       {formatarReais(t.valor)}
                     </td>
                   </tr>

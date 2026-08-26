@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { VoltarLink } from "@/components/VoltarLink";
 
-const CARD = "rounded-2xl border border-white/10 bg-zinc-900/60 p-6";
-const CARD_TITLE = "mb-4 text-sm font-semibold text-zinc-500";
+const CARD = "rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-base)] p-6";
+const CARD_TITLE = "mb-4 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]";
 
 type RespostaResolvida = {
   label: string;
@@ -73,26 +73,36 @@ export default async function Ds160RascunhoPage({ params }: { params: Promise<{ 
     <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
       <VoltarLink href={`/clientes/${id}`} label="Voltar pra ficha do cliente" />
 
-      <h1 className="text-xl font-semibold text-white">Rascunho do DS-160 — {cliente.nome}</h1>
+      <h1 className="text-[length:var(--text-h1)] leading-[var(--leading-h1)] font-semibold tracking-[var(--tracking-h1)] text-[var(--color-text)]">
+        Rascunho do DS-160 — {cliente.nome}
+      </h1>
 
       {erro && (
-        <p className="rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-300">{erro}</p>
+        <p className="rounded-lg border border-[var(--color-danger-border)] bg-[var(--color-danger-surface)] px-4 py-3 text-sm text-[var(--color-danger)]">
+          {erro}
+        </p>
       )}
 
       {dados && (
         <>
-          <p className="text-sm text-zinc-500">
-            Status: <span className="text-zinc-300">{dados.status}</span> — {itens.length} pergunta(s) respondida(s)
+          <p className="text-sm text-[var(--color-text-muted)]">
+            Status: <span className="text-[var(--color-text-subtle)]">{dados.status}</span> —{" "}
+            {itens.length} pergunta(s) respondida(s)
           </p>
           <section className={CARD}>
             <h2 className={CARD_TITLE}>Respostas</h2>
             <dl className="flex flex-col gap-3">
               {itens.map(([campoId, r]) => (
-                <div key={campoId} className="border-b border-white/5 pb-3 last:border-0 last:pb-0">
-                  <dt className="text-xs font-medium text-zinc-500">{r.label}</dt>
-                  <dd className="text-sm text-zinc-200">{formatarValor(r)}</dd>
+                <div
+                  key={campoId}
+                  className="border-b border-[var(--color-border-subtle)] pb-3 last:border-0 last:pb-0"
+                >
+                  <dt className="text-xs font-medium text-[var(--color-text-muted)]">{r.label}</dt>
+                  <dd className="text-sm text-[var(--color-text-subtle)]">{formatarValor(r)}</dd>
                   {r.explicacao && (
-                    <dd className="mt-1 text-xs italic text-amber-300/80">Explicação: {r.explicacao}</dd>
+                    <dd className="mt-1 text-xs italic text-[var(--color-warning)]">
+                      Explicação: {r.explicacao}
+                    </dd>
                   )}
                 </div>
               ))}

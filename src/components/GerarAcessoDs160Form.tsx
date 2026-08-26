@@ -17,12 +17,12 @@ export function GerarAcessoDs160Form({ clienteId, temCpf }: { clienteId: string;
             : "Esse cliente não tem CPF cadastrado — o CPF é a senha de login do Rascunho DS160. Cadastre o CPF antes de gerar o acesso."
         }
         disabled={pendente}
-        className="w-fit rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-500 disabled:opacity-60"
+        className="w-fit rounded-lg border border-[var(--color-accent-border)] bg-[var(--color-accent-surface)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors duration-150 ease-out hover:border-[var(--color-accent)] disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
       >
         {pendente ? "Gerando..." : "Gerar acesso Rascunho DS160"}
       </ConfirmSubmitButton>
-      {estado?.erro && <p className="text-sm text-red-400">{estado.erro}</p>}
-      {estado?.aviso && <p className="text-sm text-amber-400">{estado.aviso}</p>}
+      {estado?.erro && <p className="text-sm text-[var(--color-danger)]">{estado.erro}</p>}
+      {estado?.aviso && <p className="text-sm text-[var(--color-warning)]">{estado.aviso}</p>}
     </form>
   );
 }

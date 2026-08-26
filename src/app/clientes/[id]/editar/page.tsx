@@ -4,6 +4,11 @@ import { atualizarDadosCliente } from "@/app/actions";
 import { CampoData } from "@/components/CampoData";
 import { VoltarLink } from "@/components/VoltarLink";
 
+const INPUT =
+  "rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-base-deep)] px-3 py-2 text-[var(--color-text)] outline-none transition-colors duration-150 ease-out focus:border-[var(--color-accent-focus)] focus:ring-2 focus:ring-[var(--color-accent-ring)]";
+const BTN_PRIMARY =
+  "self-start rounded-full border border-[var(--color-accent)] bg-[var(--color-accent-surface)] px-4 py-2 text-sm font-semibold text-[var(--color-accent)] shadow-[var(--shadow-accent-rest)] transition-shadow duration-150 ease-out hover:shadow-[var(--shadow-accent-hover)] motion-safe:hover:-translate-y-px motion-safe:transition-[transform,box-shadow] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]";
+
 export default async function EditarClientePage(props: PageProps<"/clientes/[id]/editar">) {
   const { id } = await props.params;
 
@@ -15,14 +20,18 @@ export default async function EditarClientePage(props: PageProps<"/clientes/[id]
   return (
     <div className="flex flex-col gap-6">
       <VoltarLink href={`/clientes/${cliente.id}`} label="Voltar pra ficha do cliente" />
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Editar cliente</h1>
+      <h1 className="text-[length:var(--text-display)] leading-[var(--leading-display)] font-semibold tracking-[var(--tracking-display)] text-[var(--color-text)]">
+        Editar cliente
+      </h1>
 
       <form
         action={atualizarComId}
-        className="flex flex-col gap-8 rounded-2xl border border-white/10 bg-zinc-900/60 p-7"
+        className="flex flex-col gap-8 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-base)] p-7"
       >
         <section className="flex flex-col gap-4">
-          <h2 className="text-sm font-semibold text-zinc-500">Dados pessoais</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+            Dados pessoais
+          </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Campo label="Nome completo" name="nome" defaultValue={cliente.nome} required />
             <Campo label="CPF" name="cpf" defaultValue={cliente.cpf ?? ""} />
@@ -31,6 +40,7 @@ export default async function EditarClientePage(props: PageProps<"/clientes/[id]
             <CampoData
               label="Data de nascimento"
               name="dataNascimento"
+              className={INPUT}
               defaultValue={
                 cliente.dataNascimento
                   ? new Date(cliente.dataNascimento).toISOString().slice(0, 10)
@@ -41,8 +51,10 @@ export default async function EditarClientePage(props: PageProps<"/clientes/[id]
           </div>
         </section>
 
-        <section className="flex flex-col gap-4 border-t border-white/5 pt-6">
-          <h2 className="text-sm font-semibold text-zinc-500">Passaporte</h2>
+        <section className="flex flex-col gap-4 border-t border-[var(--color-border-subtle)] pt-6">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+            Passaporte
+          </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Campo
               label="Número do passaporte"
@@ -52,6 +64,7 @@ export default async function EditarClientePage(props: PageProps<"/clientes/[id]
             <CampoData
               label="Validade"
               name="validadePassaporte"
+              className={INPUT}
               defaultValue={
                 cliente.validadePassaporte
                   ? new Date(cliente.validadePassaporte).toISOString().slice(0, 10)
@@ -61,6 +74,7 @@ export default async function EditarClientePage(props: PageProps<"/clientes/[id]
             <CampoData
               label="Vencimento do visto atual (se for renovação)"
               name="dataVencimentoVistoAtual"
+              className={INPUT}
               defaultValue={
                 cliente.dataVencimentoVistoAtual
                   ? new Date(cliente.dataVencimentoVistoAtual).toISOString().slice(0, 10)
@@ -70,10 +84,7 @@ export default async function EditarClientePage(props: PageProps<"/clientes/[id]
           </div>
         </section>
 
-        <button
-          type="submit"
-          className="self-start rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
-        >
+        <button type="submit" className={BTN_PRIMARY}>
           Salvar alterações
         </button>
       </form>
@@ -96,16 +107,16 @@ function Campo({
 }) {
   return (
     <label className="flex flex-col gap-1.5 text-sm">
-      <span className="text-zinc-400">
+      <span className="text-[var(--color-text-subtle)]">
         {label}
-        {required && <span className="text-red-400"> *</span>}
+        {required && <span className="text-[var(--color-danger)]"> *</span>}
       </span>
       <input
         type={type}
         name={name}
         required={required}
         defaultValue={defaultValue}
-        className="rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30"
+        className={INPUT}
       />
     </label>
   );

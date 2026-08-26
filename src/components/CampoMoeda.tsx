@@ -14,7 +14,7 @@ function centavosParaIso(centavos: number): string {
 }
 
 const INPUT_PADRAO =
-  "rounded-lg border border-white/10 bg-zinc-950/60 px-3 py-2 text-zinc-100 outline-none transition-colors focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/30";
+  "rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-base-deep)] px-3 py-2 text-[var(--color-text)] outline-none transition-colors duration-150 ease-out focus:border-[var(--color-accent-focus)] focus:ring-2 focus:ring-[var(--color-accent-ring)]";
 
 export function CampoMoeda({
   label,
@@ -35,7 +35,7 @@ export function CampoMoeda({
 
   return (
     <label className="flex flex-col gap-1.5 text-sm">
-      <span className="text-zinc-400">{label}</span>
+      <span className="text-[var(--color-text-subtle)]">{label}</span>
       <input
         type="text"
         inputMode="numeric"
