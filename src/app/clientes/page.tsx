@@ -126,11 +126,16 @@ export default async function ClientesPage(props: PageProps<"/clientes">) {
         </p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-base)]">
+          <p className="border-b border-[var(--color-border-subtle)] px-5 py-2.5 text-xs text-[var(--color-text-muted)]">
+            {clientes.length} cliente{clientes.length === 1 ? "" : "s"} encontrado
+            {clientes.length === 1 ? "" : "s"}
+          </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-left text-[var(--color-text-muted)]">
                 <tr className="border-b border-[var(--color-border-subtle)]">
                   <th className="px-5 py-3 font-medium">Nome</th>
+                  <th className="px-5 py-3 font-medium">Data de cadastro</th>
                   <th className="px-5 py-3 font-medium">Etapa atual</th>
                   <th className="px-5 py-3 font-medium">Progresso</th>
                   <th className="px-5 py-3 font-medium">Entrevista</th>
@@ -153,6 +158,9 @@ export default async function ClientesPage(props: PageProps<"/clientes">) {
                         >
                           {cliente.nome}
                         </Link>
+                      </td>
+                      <td className="px-5 py-3.5 text-[var(--color-text-muted)]">
+                        {cliente.criadoEm.toLocaleDateString("pt-BR")}
                       </td>
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-2">
