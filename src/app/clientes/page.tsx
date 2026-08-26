@@ -14,6 +14,7 @@ import { formatarDataBr } from "@/lib/formatar";
 import type { Cliente, EtapaProcesso, HistoricoEtapa, Prisma } from "@/generated/prisma/client";
 
 const TODAS_ETAPAS: EtapaProcesso[] = [...ORDEM_ETAPAS, "VISTO_NEGADO"];
+const CLIENTES_POR_PAGINA = 10;
 
 const INPUT =
   "rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-base-deep)] px-3 py-2 text-[var(--color-text)] outline-none transition-colors duration-150 ease-out focus:border-[var(--color-accent-focus)] focus:ring-2 focus:ring-[var(--color-accent-ring)]";
@@ -51,6 +52,8 @@ export default async function ClientesPage(props: PageProps<"/clientes">) {
   const searchParams = await props.searchParams;
   const etapa = typeof searchParams.etapa === "string" ? searchParams.etapa : "";
   const busca = typeof searchParams.busca === "string" ? searchParams.busca.trim() : "";
+  const paginaBruta = typeof searchParams.pagina === "string" ? Number(searchParams.pagina) : 1;
+  const pagina = Number.isInteger(paginaBruta) && paginaBruta > 0 ? paginaBruta : 1;
 
   const where: Prisma.ClienteWhereInput = {};
   if (etapa && (TODAS_ETAPAS as string[]).includes(etapa)) {
@@ -64,15 +67,30 @@ export default async function ClientesPage(props: PageProps<"/clientes">) {
     ];
   }
 
+  const totalClientes = await prisma.cliente.count({ where });
+  const totalPaginas = Math.max(1, Math.ceil(totalClientes / CLIENTES_POR_PAGINA));
+  const paginaAtual = Math.min(pagina, totalPaginas);
+
   const clientes = await prisma.cliente.findMany({
     where,
     orderBy: { criadoEm: "desc" },
     include: { historico: { orderBy: { criadoEm: "desc" } } },
+    skip: (paginaAtual - 1) * CLIENTES_POR_PAGINA,
+    take: CLIENTES_POR_PAGINA,
   });
 
   const queryString = new URLSearchParams(
     Object.entries({ etapa, busca }).filter(([, v]) => v),
   ).toString();
+
+  const linkPagina = (p: number) => {
+    const params = new URLSearchParams(
+      Object.entries({ etapa, busca }).filter(([, v]) => v),
+    );
+    if (p > 1) params.set("pagina", String(p));
+    const qs = params.toString();
+    return `/clientes${qs ? `?${qs}` : ""}`;
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -127,8 +145,8 @@ export default async function ClientesPage(props: PageProps<"/clientes">) {
       ) : (
         <div className="overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-base)]">
           <p className="border-b border-[var(--color-border-subtle)] px-5 py-2.5 text-xs text-[var(--color-text-muted)]">
-            {clientes.length} cliente{clientes.length === 1 ? "" : "s"} encontrado
-            {clientes.length === 1 ? "" : "s"}
+            {totalClientes} cliente{totalClientes === 1 ? "" : "s"} encontrado
+            {totalClientes === 1 ? "" : "s"} — página {paginaAtual} de {totalPaginas}
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -206,6 +224,28 @@ export default async function ClientesPage(props: PageProps<"/clientes">) {
               </tbody>
             </table>
           </div>
+
+          {totalPaginas > 1 && (
+            <div className="flex items-center justify-between border-t border-[var(--color-border-subtle)] px-5 py-3">
+              {paginaAtual > 1 ? (
+                <Link href={linkPagina(paginaAtual - 1)} className={BTN_OUTLINE}>
+                  ← Anterior
+                </Link>
+              ) : (
+                <span />
+              )}
+              <span className="text-xs text-[var(--color-text-muted)]">
+                Página {paginaAtual} de {totalPaginas}
+              </span>
+              {paginaAtual < totalPaginas ? (
+                <Link href={linkPagina(paginaAtual + 1)} className={BTN_OUTLINE}>
+                  Próximo →
+                </Link>
+              ) : (
+                <span />
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
