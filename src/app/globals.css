@@ -11,6 +11,132 @@
   color-scheme: dark;
 }
 
+@theme {
+  /* Geist Mono já configurado em layout.tsx (--font-geist-mono) — mapeia
+     pra utility font-mono do Tailwind, usada em número de processo, data
+     de carimbo, ID de cliente (DESIGN.md §5). */
+  --font-mono: var(--font-geist-mono);
+}
+
+/*
+ * Design tokens — Flow 2N Assessoria (ver DESIGN.md na raiz).
+ * Extraídos literalmente de src/app/login/page.tsx, zero hex novo.
+ * Regra de aplicação: fora deste bloco, zero hex literal em componente —
+ * usar var(--color-*) etc via arbitrary value do Tailwind.
+ */
+:root {
+  /* base */
+  --color-base: #0b1d2e;
+  --color-base-deep: #08141f;
+  --color-text: #f4eee1;
+  --color-text-muted: rgba(244, 238, 225, 0.6);
+  --color-text-subtle: rgba(244, 238, 225, 0.7);
+
+  /* acento — único, dourado, papel = selo/carimbo */
+  --color-accent: #c9a34d;
+  --color-accent-border: rgba(201, 163, 77, 0.3);
+  --color-accent-focus: rgba(201, 163, 77, 0.6);
+  --color-accent-ring: rgba(201, 163, 77, 0.3);
+  --color-accent-surface: rgba(30, 66, 88, 0.4);
+
+  /* neutro funcional */
+  --color-border-subtle: rgba(255, 255, 255, 0.1);
+
+  /* status — funcional, mesma temperatura do resto da paleta */
+  --color-danger: #d9704a;
+  --color-danger-border: rgba(217, 112, 74, 0.3);
+  --color-danger-surface: rgba(217, 112, 74, 0.1);
+  --color-success: #4f7a5c;
+  --color-success-surface: rgba(79, 122, 92, 0.12);
+  --color-warning: #b08a3e;
+
+  /* tipografia — Geist já configurado em layout.tsx, caráter vem do
+     peso/escala/tracking (DESIGN.md §5), não de trocar família. */
+  --text-display: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem);
+  --text-h1: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
+  --leading-display: 1.1;
+  --leading-h1: 1.2;
+  --tracking-display: -0.02em;
+  --tracking-h1: -0.01em;
+
+  /* shadow */
+  --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  --shadow-accent-rest: 0 0 24px rgba(201, 163, 77, 0.25);
+  --shadow-accent-hover: 0 0 32px rgba(201, 163, 77, 0.4);
+  --shadow-accent-open: 0 0 10px rgba(201, 163, 77, 0.18);
+
+  /* motion */
+  --dur-micro: 150ms;
+  --dur-layout: 220ms;
+  --dur-seal: 360ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-inout: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+/* Accordion (Grupo familiar, Observações) — grid-template-rows 0fr→1fr,
+   sem jank de height:auto. Chevron rotaciona junto. */
+.accordion-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--dur-layout) var(--ease-inout);
+}
+.accordion-panel[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+.accordion-panel > div {
+  overflow: hidden;
+}
+.accordion-chevron {
+  transition: transform var(--dur-micro) var(--ease-out);
+}
+.accordion-chevron[data-open="true"] {
+  transform: rotate(180deg);
+}
+
+/* Selo "aberta" (etapa atual) — glow pulsante só no anel, nunca no texto. */
+@keyframes anel-pulso {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 163, 77, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(201, 163, 77, 0.12);
+  }
+}
+.selo-aberta {
+  animation: anel-pulso 2.4s var(--ease-inout) infinite;
+}
+
+/* Selar etapa (avançar pipeline) — único motion com "peso" do painel.
+   Disparado uma vez, via SeloSelarEffect, quando a etapa muda de
+   aberta pra selada (o carimbo bate). */
+@keyframes selar-etapa {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.selo-selando {
+  animation: selar-etapa var(--dur-seal) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accordion-panel,
+  .accordion-chevron {
+    transition: none;
+  }
+  .selo-aberta,
+  .selo-selando {
+    animation: none;
+  }
+}
+
 body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
