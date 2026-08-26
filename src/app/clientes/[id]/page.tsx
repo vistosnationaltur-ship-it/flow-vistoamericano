@@ -208,6 +208,16 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
                         ver rascunho →
                       </Link>
                     )}
+                    {etapa === "DS160_PREENCHIDO" && estado !== "futura" && cliente.numeroDs160 && (
+                      <span className="rounded-full bg-[var(--color-accent)]/10 px-2 py-0.5 font-mono text-xs font-semibold text-[var(--color-accent)]">
+                        Nº {cliente.numeroDs160}
+                      </span>
+                    )}
+                    {etapa === "AGENDAMENTO_ENTREVISTA" && estado !== "futura" && cliente.dataEntrevista && (
+                      <span className="rounded-full bg-[var(--color-accent)]/10 px-2 py-0.5 font-mono text-xs font-semibold text-[var(--color-accent)]">
+                        {new Date(cliente.dataEntrevista).toLocaleDateString("pt-BR")}
+                      </span>
+                    )}
                   </span>
                   {data && (
                     <span className="shrink-0 font-mono text-xs text-[var(--color-text-muted)]">
