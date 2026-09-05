@@ -249,6 +249,15 @@ export default async function ClienteDetalhePage(props: PageProps<"/clientes/[id
                       <GerarAcessoDs160Form clienteId={cliente.id} temCpf={Boolean(cliente.cpf)} />
                     )}
 
+                    {cliente.cpf && (
+                      <a
+                        href={`ds160robo://${cliente.cpf.replace(/\D/g, "")}`}
+                        className={`${BTN_SALVAR} inline-block`}
+                      >
+                        Buscar dados no robô DS-160
+                      </a>
+                    )}
+
                     {etapa === "AGENDAMENTO_ENTREVISTA" && (
                       <form action={dataEntrevistaComId} className="flex flex-wrap items-end gap-3">
                         <CampoData
